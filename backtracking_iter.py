@@ -2,15 +2,12 @@
 import queue
 import threading
 import sys
-if sys.platform == "win32":
-    import multiprocess as multiprocessing
-    from multiprocess.managers import BaseManager
-else:
-    from multiprocessing.managers import BaseManager
-    import multiprocessing
+import multiprocess as multiprocessing
+from multiprocess.managers import BaseManager
 
 from queue import LifoQueue
 import time
+
 
 class LifoManager(BaseManager):
     pass
@@ -21,17 +18,20 @@ class Backtracker():
     """Allow for interaction with backtracking progress.
     Also handle threads."""
 
-    def __init__(self, next_choice_func, *, starting_guesses=None, partial_checker=None, candidate_matcher=None, greedy=True):
+    def __init__(self, next_choice_func, *, starting_guesses=None, partial_checker=None, candidate_matcher=None):
         self.next_choice_func = next_choice_func
         self.starting_guesses = starting_guesses
         self.partial_checker = partial_checker
         self. candidate_matcher = candidate_matcher
-        self.greedy = greedy
         self.manager = LifoManager()
         self.manager.start()
-        # self.intermediate_queue = self.manager.LifoQueue()
-        self.intermediate_queue = multiprocessing.Queue()
+        self.intermediate_queue = self.manager.LifoQueue()
+        for s in starting_guesses:
+            for g in next_choice_func(s):
+                self.intermediate_queue.put(g)
+        # self.intermediate_queue = multiprocessing.Queue()
         self.solutions_queue = multiprocessing.Queue()
+        self.outbox = queue.Queue()
         self.mythreads = []
 
     def go(self, numthreads=1):
@@ -43,19 +43,26 @@ class Backtracker():
                         starting_guesses=self.starting_guesses,
                         partial_checker=self.partial_checker,
                         candidate_matcher=self.candidate_matcher,
-                        greedy=self.greedy,
                         intermediate_queue=self.intermediate_queue,
-                        solutions_queue=self.solutions_queue
+                        solutions_queue=self.solutions_queue,
+                        mailbox=self.outbox
                     )
                 )
             )
         for t in self.mythreads:
-            time.sleep(0.1)
             t.start()
+            time.sleep(0.05)
 
     def quit(self):
-        pass
+        for t in self.mythreads:
+            t.terminate()
 
+    def msg_all(self, m):
+        self.outbox.put(m)
+
+    def join(self):
+        for t in self.mythreads:
+            t.join()
 
 
 def thread_target_wrapper(*args, **kwargs):
@@ -64,7 +71,7 @@ def thread_target_wrapper(*args, **kwargs):
     return wrapped
 
 
-def backtrack(next_choice_func, *, starting_guesses=None, partial_checker=None, candidate_matcher=None, greedy=True, intermediate_queue=None, solutions_queue=None):
+def backtrack(next_choice_func, *, starting_guesses=None, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None):
     """next_choice_func should be a function that take a sequences and 
     returns any a list of all possible next items in that sequence.
     candidate_matcher should be a function that returns whether 
@@ -94,25 +101,23 @@ def backtrack(next_choice_func, *, starting_guesses=None, partial_checker=None, 
             q.put(i)
 
     while q.qsize() > 0:
-        try:
-            partial = q.get()
-            # print("partial",partial)
-            for guess in next_choice_func(partial):
-                head = tuple(partial) + tuple([guess])
-                if candidate_matcher(head):
-                    print(head)
-                    solutions.put(head)
-                    if greedy:
-                        return [head]
-                elif partial_checker(head):
-                    q.put(head)
-
-                else:
-                    pass
+        # quit()
+        for i in range(mailbox.qsize()):
+            v = q.get()
+            print("Received:", v)
+            if v == 1:
+                quit()
+        partial = q.get()
+        # print("partial",partial)
+        for guess in next_choice_func(partial):
+            head = tuple(partial) + tuple([guess])
+            if candidate_matcher(head):
                 # print(head)
-        except KeyboardInterrupt:
-            return
-    results = []
-    for i in range(solutions.qsize()):
-        results.append(solutions.get())
-    return results
+                solutions.put(head)
+            elif partial_checker(head):
+                q.put(head)
+
+            else:
+                pass
+            # print(head)
+    quit()

@@ -25,10 +25,10 @@ class SudokuBoard():
             raise ValueError("Requested size too small ({})".format(size))
         elif size**(1 / 2) % 1 != 0:
             raise ValueError("Size must be a square number!")
+        self.original = serialized[:]
         self.serialized = pad_serialized_board(serialized, size)
         self.rows = []
         self.rows = sublists(self.serialized, size)
-        self.original = serialized[:]
         # print(self.rows)
         # print("Constructed this board: ")
         # pp(self.rows)
@@ -36,7 +36,7 @@ class SudokuBoard():
         self.all_digits = set(range(1, size + 1))
 
     def check(self):
-        return self.check_partial() and len(self.original) == self.square
+        return self.check_partial() and len(self.original) == self.square and not (0 in self.original)
 
     def quadrant(self, n):
         sq = []
@@ -113,7 +113,7 @@ class SudokuBoard():
 
     def __str__(self):
         sroot = int(self.size**(1 / 2))
-        rowsep = "\n" + "-" * (self.size + 4)
+        rowsep = "\n" + "-" * (self.size + self.size//self.root + 1)
         return rowsep + "\n" + '\n'.join("|" + ''.join(str(i) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + (rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
 
 
@@ -151,7 +151,6 @@ def sudoku_next_choice_wrapper(serialized_board, size):
     #       (size * size) - len(serialized_board))
 
     def wrapped(head) -> list:
-
         # print("Choosing next from", head)
         final = None
         if len(head) >= len(extended):
@@ -164,6 +163,7 @@ def sudoku_next_choice_wrapper(serialized_board, size):
                 # if len(head) >= 54 == 0:
                 #     print(b)
                 final = sudoku_next_choices(head,size)
+                # final.sort(key=lambda x: 1/(len(sudoku_next_choices(list(head) + [x],size))+1))
             else:
                 # print("Occupied space. Choosing its value.")
                 final = [selected]
@@ -197,13 +197,13 @@ def sudoku_final_wrapper(size):
 
 def main():
     print("Sudoku")
-    bsize = 9
     print("Test case:")
     start = [int(i) for i in list(
-        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
-    start = [int(i) for i in list(
         """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
+    start = [int(i) for i in list(
+        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
     # start = []
+    bsize = 9
     # print(start)
     tb = SudokuBoard(start, bsize)
     print(tb)
@@ -221,44 +221,48 @@ def main():
         numthreads = int(input("num threads?\n>>>").strip())
     except ValueError:
         numthreads = 8
+    print(numthreads,"threads")
     br = backtracking_iter.Backtracker(
         next_choice_func=sudoku_next_choice_wrapper(start, bsize),
         candidate_matcher=sudoku_final_wrapper(bsize),
         partial_checker=sudoku_partial_wrapper(bsize),
-        greedy=False,
         starting_guesses=[[]])
     br.go(numthreads=numthreads)
 
     prev = 0
     cur = 0
     hist = []
-    while br.intermediate_queue.qsize() > 0:
+    c = 0
+    while br.intermediate_queue.qsize() > 0 and  br.solutions_queue.qsize() == 0:
+        # print("test")
         cur = br.intermediate_queue.qsize()
         delta = cur - prev
         solsize = br.solutions_queue.qsize()
-        hist.append((cur,delta,solsize))
+        # hist.append((cur,delta,solsize))
         try:
             print("inter:", cur, "delta", delta,
                   "sols:", solsize)
+            if c == 0 and False:
+                b = br.intermediate_queue.get()
+                br.intermediate_queue.put(b)
+                print(SudokuBoard(b,bsize))
             prev = cur
             # input("\n>>>")
+            c = (c+1)%10
             time.sleep(1)
         except KeyboardInterrupt:
-            sols = []
-            if br.solutions_queue.qsize() > 0:
-                for i in range(br.solutions_queue.qsize()):
-                    sols.append(br.solutions_queue.get())
-                with open("solutions.txt", 'w') as f:
-                    f.write('\n'.join(str(SudokuBoard(i, bsize)) for i in sols))
-            for t in br.mythreads:
-                t.terminate()
+            # for t in br.mythreads:
+            #     t.terminate()
             print("Exited safely.")
             break
+    br.quit()
+    br.join()
     results = []
     for i in range(br.solutions_queue.qsize()):
         results.append(SudokuBoard(br.solutions_queue.get(), bsize))
-    for i in results:
-        print(i)
+    results = [i for i in results if i.check()]
+    with open("solutions.txt", 'w') as f:
+        f.write("{} boards\n".format(len(results)) + '\n'.join(str(i) for i in results))
 
 if __name__ == '__main__':
     main()
