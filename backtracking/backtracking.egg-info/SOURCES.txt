@@ -1,0 +1,7 @@
+setup.py
+backtracking/__init__.py
+backtracking.egg-info/PKG-INFO
+backtracking.egg-info/SOURCES.txt
+backtracking.egg-info/dependency_links.txt
+backtracking.egg-info/top_level.txt
+backtracking.egg-info/zip-safe

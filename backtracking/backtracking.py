@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import queue
-import threading
 import sys
-import multiprocess as multiprocessing
-from multiprocess.managers import BaseManager
-
+if sys.platform == "win32":
+    import multiprocess as multiprocessing
+    from multiprocess.managers import BaseManager
+else:
+    import multiprocessing
+    from multiprocessing.managers import BaseManager
 from queue import LifoQueue
 import time
 
@@ -26,10 +28,11 @@ class Backtracker():
         self.manager = LifoManager()
         self.manager.start()
         self.intermediate_queue = self.manager.LifoQueue()
+        # self.intermediate_queue = multiprocessing.Queue()
         for s in starting_guesses:
             for g in next_choice_func(s):
-                self.intermediate_queue.put(g)
-        # self.intermediate_queue = multiprocessing.Queue()
+                # assert(isinstance(g,list))
+                self.intermediate_queue.put([g])
         self.solutions_queue = multiprocessing.Queue()
         self.outbox = queue.Queue()
         self.mythreads = []
@@ -40,7 +43,6 @@ class Backtracker():
                 multiprocessing.Process(
                     target=thread_target_wrapper(
                         next_choice_func=self.next_choice_func,
-                        starting_guesses=self.starting_guesses,
                         partial_checker=self.partial_checker,
                         candidate_matcher=self.candidate_matcher,
                         intermediate_queue=self.intermediate_queue,
@@ -51,7 +53,7 @@ class Backtracker():
             )
         for t in self.mythreads:
             t.start()
-            time.sleep(0.05)
+            time.sleep(0.1)
 
     def quit(self):
         for t in self.mythreads:
@@ -71,7 +73,7 @@ def thread_target_wrapper(*args, **kwargs):
     return wrapped
 
 
-def backtrack(next_choice_func, *, starting_guesses=None, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None):
+def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None):
     """next_choice_func should be a function that take a sequences and 
     returns any a list of all possible next items in that sequence.
     candidate_matcher should be a function that returns whether 
@@ -94,13 +96,7 @@ def backtrack(next_choice_func, *, starting_guesses=None, partial_checker=None, 
     else:
         solutions = solutions_queue
     assert not candidate_matcher is None, "A function to match final solutions must be provided."
-    if starting_guesses:
-        assert isinstance(starting_guesses[0], list), "Requires 2d list"
-        assert isinstance(starting_guesses, list), "Requires 2d list"
-        for i in starting_guesses:
-            q.put(i)
-
-    while q.qsize() > 0:
+    while True:
         # quit()
         for i in range(mailbox.qsize()):
             v = q.get()
@@ -109,12 +105,19 @@ def backtrack(next_choice_func, *, starting_guesses=None, partial_checker=None, 
                 quit()
         partial = q.get()
         # print("partial",partial)
+        try:
+            assert isinstance(partial,list)
+        except AssertionError as e:
+            print("PARTIAL:",partial)
+            raise e
         for guess in next_choice_func(partial):
-            head = tuple(partial) + tuple([guess])
+            head = partial + [guess]
+            assert isinstance(head,list)
             if candidate_matcher(head):
                 # print(head)
                 solutions.put(head)
             elif partial_checker(head):
+                assert isinstance(head,list)
                 q.put(head)
 
             else:

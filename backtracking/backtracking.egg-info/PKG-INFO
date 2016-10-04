@@ -1,0 +1,16 @@
+Metadata-Version: 1.1
+Name: backtracking
+Version: 0.1.0
+Summary: An object and functions to facilitate multi-processed backtracking.
+Home-page: UNKNOWN
+Author: Christopher Chen
+Author-email: christopher.chen1995@gmail.com
+License: Public Domain
+Description: Iterative backtracking manager.
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Operating System :: OS Independent
