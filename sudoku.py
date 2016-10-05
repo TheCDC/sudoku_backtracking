@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 import backtracking
-from beeprint import pp
 import time
-import functools
-import random
 """Sudoku stuff will be working with a serialized version of a board.
 The whole board will be a 1-dimensional list of digits.
 Any functions involving a board should be aware of this."""
 
 
 class SudokuBoard():
+
+    """Handle a Sudoku board and various bits of information needed to solve it."""
 
     def __init__(self, serialized, size):
         self.size = size
@@ -33,9 +32,12 @@ class SudokuBoard():
         self.all_digits = set(range(1, size + 1))
 
     def check(self) -> bool:
+        """Return whether the board is solved."""
         return self.check_partial() and len(self.original) == self.square
 
     def quadrant(self, n) -> list:
+        """Return a list of all cells in the nth quadrant, start fomr the top left
+        and going first to the right then down."""
         sq = []
         row_offset = self.root * (n // self.root)
         rows = self.rows[row_offset: row_offset + self.root]
@@ -45,15 +47,18 @@ class SudokuBoard():
         return sq
 
     def row(self, y) -> list:
+        """Return a list of all cells in the nth row."""
         return self.rows[y]
 
     def col(self, x) -> list:
+        """Return a lsit of all cells in the nth column."""
         ns = []
         for i in range(self.size):
             ns.append(self.rows[i][x])
         return ns
 
     def check_partial(self) -> bool:
+        """Return whether the board does not violate any rules."""
         if len(self.original) > self.square:
             return False
 
@@ -63,15 +68,15 @@ class SudokuBoard():
                 return False
         for i in range(self.square):
             # check for any empty cells with 0 candidates
-            x,y = lin_to_xy(i,self.size)
-            z = self.get(x,y)
-            if len(self.candidates(x,y)) == 0 and z == 0:
+            x, y = lin_to_xy(i, self.size)
+            z = self.get(x, y)
+            if len(self.candidates(x, y)) == 0 and z == 0:
                 return False
 
         return True
 
     def candidates(self, x, y) -> set:
-        """Get set of possible digits that could be filled into cell at x,y"""
+        """Get the set of possible digits that could be filled into cell at x,y"""
         ns = []
         # horizontal line
         ns.extend(self.row(y))
@@ -190,6 +195,34 @@ def sudoku_final_wrapper(size):
     return wrapped
 
 
+def solve_string(s, *args, **kwargs) -> SudokuBoard:
+    """Take a string serialized board return the solved board.
+    Results may vary based on threading."""
+    return solve_list([int(i) for i in s], *args, **kwargs)
+
+
+def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
+    """Take a list serialized board and return the solved board.
+    Results may vary based on threading."""
+    br = backtracking.Backtracker(
+        next_choice_func=sudoku_next_choice_wrapper(l, size),
+        candidate_matcher=sudoku_final_wrapper(size),
+        partial_checker=sudoku_partial_wrapper(size),
+        starting_guesses=[[]])
+    br.go(numthreads=num_processes)
+    ti = time.time()
+    while br.solutions_queue.qsize() == 0 and br.intermediate_queue.qsize() > 0:
+        if timeout:
+            if time.time() - ti >= timeout:
+                return None
+    br.terminate()
+    num_solutions = br.solutions_queue.qsize()
+    if num_solutions > 0:
+        return SudokuBoard(br.solutions_queue.get(), size)
+    else:
+        return None
+
+
 def main():
     print("Sudoku")
     print("Test case:")
@@ -215,6 +248,7 @@ def main():
     # assert tb.row(8) == [int(i) for i in "005010300"]
     # print(tb.candidates(0,0))
     # input()
+    print(solve_list(start, 9, 8,timeout=60000))
 
     try:
         numthreads = int(input("How many threads? default=8\n>>>").strip())

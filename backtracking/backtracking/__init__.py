@@ -29,7 +29,7 @@ class Backtracker():
             Starting guesses may be left as None to delegate that to the next_choice_func.
 
         partial_checker: a function which takes a partial solution and return whether is still fits within contraints.
-        
+
         candidate_matcher: a function which returns whether a partial solution has the form of a final solution.
             In the case of solving sudoku, the candidate_matcher might be same as the partial_checker but also 
             checks for the correct length of the solution.
@@ -79,6 +79,7 @@ class Backtracker():
 
     def quit(self):
         """Terminate all child processes."""
+        self.msg_all(1)
         for t in self.mythreads:
             t.terminate()
 
