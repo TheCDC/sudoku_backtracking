@@ -249,6 +249,7 @@ def main():
     # print(tb.candidates(0,0))
     # input()
     print(solve_list(start, 9, 8,timeout=60000))
+    quit()
 
     try:
         numthreads = int(input("How many threads? default=8\n>>>").strip())
