@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-import backtracking
-import time
 """Sudoku stuff will be working with a serialized version of a board.
 The whole board will be a 1-dimensional list of digits.
 Any functions involving a board should be aware of this."""
+import backtracking
+import time
 
 
 class SudokuBoard():
@@ -204,6 +204,9 @@ def solve_string(s, *args, **kwargs) -> SudokuBoard:
 def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     """Take a list serialized board and return the solved board.
     Results may vary based on threading."""
+    tb = SudokuBoard(l,size)
+    if not tb.check_partial():
+        raise ValueError("Ilegal starting board.")
     br = backtracking.Backtracker(
         next_choice_func=sudoku_next_choice_wrapper(l, size),
         candidate_matcher=sudoku_final_wrapper(size),
@@ -220,20 +223,20 @@ def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     if num_solutions > 0:
         return SudokuBoard(br.solutions_queue.get(), size)
     else:
-        raise RuntimeError("Solving job timed out!")
+        return None
 
 
 def main():
     print("Sudoku")
     print("Test case:")
     start = [int(i) for i in list(
-        """483921657900305001001806400008102900700000008006708200002609500800203009005010300""")]
-    start = [int(i) for i in list(
-        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
-    start = [int(i) for i in list(
         """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
     start = [int(i) for i in list(
         """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
+    start = [int(i) for i in list(
+        """483921657900305001001806400008102900700000008006708200002609500800203009005010300""")]
+    start = [int(i) for i in list(
+        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
     # start = []
     bsize = 9
     # print(start)
@@ -248,8 +251,7 @@ def main():
     # assert tb.row(8) == [int(i) for i in "005010300"]
     # print(tb.candidates(0,0))
     # input()
-    print(solve_list(start, 9, 8,timeout=60000))
-    quit()
+    # print(solve_list(start, 9, 8,timeout=60000))
 
     try:
         numthreads = int(input("How many threads? default=8\n>>>").strip())
@@ -287,17 +289,19 @@ def main():
             #     t.terminate()
             print("Exited safely.")
             break
-    br.quit()
+    br.terminate()
     br.join()
     if br.solutions_queue.qsize() > 0:
-        print("Early solution found!")
-    results = []
-    for i in range(br.solutions_queue.qsize()):
-        results.append(SudokuBoard(br.solutions_queue.get(), bsize))
-    results = [i for i in results if i.check()]
-    with open("solutions.txt", 'w') as f:
-        f.write("{} boards\n".format(len(results)) +
-                '\n'.join(str(i) for i in results))
+        print("Solution found!")
+        results = []
+        for i in range(br.solutions_queue.qsize()):
+            r = SudokuBoard(br.solutions_queue.get(), bsize)
+            print(r)
+            results.append(r)
+        results = [i for i in results if i.check()]
+        with open("solutions.txt", 'w') as f:
+            f.write("{} boards\n".format(len(results)) +
+                    '\n'.join(str(i) for i in results))
 
 if __name__ == '__main__':
     main()

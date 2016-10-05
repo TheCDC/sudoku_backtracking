@@ -79,7 +79,7 @@ class Backtracker():
 
     def terminate(self):
         """Terminate all child processes."""
-        self.msg_all(1)
+        # self.msg_all(1)
         for t in self.mythreads:
             t.terminate()
 
