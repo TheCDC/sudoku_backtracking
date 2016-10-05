@@ -32,10 +32,10 @@ class SudokuBoard():
         # print("From this list:", serialized)
         self.all_digits = set(range(1, size + 1))
 
-    def check(self):
+    def check(self) -> bool:
         return self.check_partial() and len(self.original) == self.square
 
-    def quadrant(self, n):
+    def quadrant(self, n) -> list:
         sq = []
         row_offset = self.root * (n // self.root)
         rows = self.rows[row_offset: row_offset + self.root]
@@ -53,7 +53,7 @@ class SudokuBoard():
             ns.append(self.rows[i][x])
         return ns
 
-    def check_partial(self):
+    def check_partial(self) -> bool:
         if len(self.original) > self.square:
             return False
 
@@ -70,7 +70,8 @@ class SudokuBoard():
 
         return True
 
-    def candidates(self, x, y):
+    def candidates(self, x, y) -> set:
+        """Get set of possible digits that could be filled into cell at x,y"""
         ns = []
         # horizontal line
         ns.extend(self.row(y))
@@ -84,32 +85,33 @@ class SudokuBoard():
             for y in range(ymin, ymax):
                 ns.append(self.rows[y][x])
 
-        cans = tuple(self.all_digits - set(ns) - set([0]))
+        cans = self.all_digits - set(ns) - set([0])
         # print(set(ns) - set([0]))
         # print("Candidates for",x,y,cans)
         return cans
 
-    def get(self, x, y):
+    def get(self, x, y) -> int:
+        """Get value of cell at x,y"""
         return self.rows[y][x]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "SudokuBoard({}, {})".format(self.serialized, self.size)
 
-    def __str__(self):
+    def __str__(self) -> str:
         sroot = int(self.size**(1 / 2))
         rowsep = "\n" + "-" * (self.size + self.size // self.root + 1)
         return rowsep + "\n" + '\n'.join("|" + ''.join(str(i) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + (rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
 
 
-def lin_to_xy(n, size):
+def lin_to_xy(n, size) -> tuple:
     return (n % size, n // size)
 
 
-def sublists(l, partition_size):
+def sublists(l, partition_size) -> list:
     return [l[i:i + partition_size] for i in range(0, len(l), partition_size)]
 
 
-def pad_serialized_board(head, size):
+def pad_serialized_board(head, size) -> tuple:
     return tuple(head) + tuple(0 for i in range((size * size) - len(head)))
 
 
@@ -123,7 +125,7 @@ def invalid_set(x) -> bool:
     return uniques < nozeroes
 
 
-def sudoku_next_choices(head, size):
+def sudoku_next_choices(head, size) -> list:
     b = SudokuBoard(head, size)
     return list(b.candidates(*lin_to_xy(len(head), size)))
 
@@ -175,13 +177,13 @@ def sudoku_test_func(head, size) -> bool:
 
 
 def sudoku_partial_wrapper(size):
-    def wrapped(head):
+    def wrapped(head) -> bool:
         return sudoku_test_func(head, size)
     return wrapped
 
 
 def sudoku_final_wrapper(size):
-    def wrapped(head):
+    def wrapped(head) -> bool:
         # print(head)
         # return len(head) == size * size
         return SudokuBoard(head, size).check()
