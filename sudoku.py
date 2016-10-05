@@ -67,14 +67,6 @@ class SudokuBoard():
             z = self.get(x,y)
             if len(self.candidates(x,y)) == 0 and z == 0:
                 return False
-                # print("checking row:", row)
-            # need to check each square
-            # there are size squares, call this n
-            # for nth square
-            # square size = size**(1/2)
-            # square horiz offset = n% (root size)
-            # vert offset = n/(root size)
-            # print(root)
 
         return True
 
@@ -204,6 +196,8 @@ def main():
     start = [int(i) for i in list(
         """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
     start = [int(i) for i in list(
+        """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
+    start = [int(i) for i in list(
         """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
     # start = []
     bsize = 9
@@ -221,7 +215,7 @@ def main():
     # input()
 
     try:
-        numthreads = int(input("num threads?\n>>>").strip())
+        numthreads = int(input("How many threads? default=8\n>>>").strip())
     except ValueError:
         numthreads = 8
     print(numthreads, "threads")

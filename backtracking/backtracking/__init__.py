@@ -17,28 +17,50 @@ LifoManager.register('LifoQueue', LifoQueue)
 
 
 class Backtracker():
-    """Allow for interaction with backtracking progress.
-    Also handle threads."""
+    """A class that handles backtracking using multiple processes.
+    Reflects the API used by the backtracking function itself.
+    Given the functions necessary to perform backtracking this class
+        """
 
-    def __init__(self, next_choice_func, *, starting_guesses=None, partial_checker=None, candidate_matcher=None):
+    def __init__(self, *, next_choice_func=None,  starting_guesses=None, partial_checker=None, candidate_matcher=None):
+        """next_choice_func: a function which takes a list (a partial solution) and returns a list of possible next choices.
+
+        starting_guesses: a list of sequences (partial solutions) from which the algorithm should start building.
+            Starting guesses may be left as None to delegate that to the next_choice_func.
+
+        partial_checker: a function which takes a partial solution and return whether is still fits within contraints.
+        
+        candidate_matcher: a function which returns whether a partial solution has the form of a final solution.
+            In the case of solving sudoku, the candidate_matcher might be same as the partial_checker but also 
+            checks for the correct length of the solution.
+        """
+
+        if None in [next_choice_func, partial_checker]:
+            raise ValueError(
+                "Backtracking requires both next_choice_func and partial_checker!")
         self.next_choice_func = next_choice_func
         self.starting_guesses = starting_guesses
         self.partial_checker = partial_checker
         self. candidate_matcher = candidate_matcher
+        # instantiate a manager that knows lifo queues
         self.manager = LifoManager()
         self.manager.start()
         self.intermediate_queue = self.manager.LifoQueue()
+
         # self.intermediate_queue = multiprocessing.Queue()
+        # feed in the starting guesses
         for s in starting_guesses:
             for g in next_choice_func(s):
-                # assert(isinstance(g,list))
                 self.intermediate_queue.put([g])
+
         self.solutions_queue = multiprocessing.Queue()
-        self.outbox = queue.Queue()
+        self.outboxes = []
         self.mythreads = []
 
     def go(self, numthreads=1):
         for i in range(numthreads):
+            newbox = queue.Queue()
+            self.outboxes.append(newbox)
             self.mythreads.append(
                 multiprocessing.Process(
                     target=thread_target_wrapper(
@@ -47,7 +69,7 @@ class Backtracker():
                         candidate_matcher=self.candidate_matcher,
                         intermediate_queue=self.intermediate_queue,
                         solutions_queue=self.solutions_queue,
-                        mailbox=self.outbox
+                        mailbox=newbox
                     )
                 )
             )
@@ -56,13 +78,17 @@ class Backtracker():
             time.sleep(0.1)
 
     def quit(self):
+        """Terminate all child processes."""
         for t in self.mythreads:
             t.terminate()
 
     def msg_all(self, m):
-        self.outbox.put(m)
+        """Put a message in mailbox queues of all children."""
+        for b in self.outboxes:
+            b.put(m)
 
     def join(self):
+        """Wait for all children to complete."""
         for t in self.mythreads:
             t.join()
 
@@ -106,18 +132,18 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
         partial = q.get()
         # print("partial",partial)
         try:
-            assert isinstance(partial,list)
+            assert isinstance(partial, list)
         except AssertionError as e:
-            print("PARTIAL:",partial)
+            print("PARTIAL:", partial)
             raise e
         for guess in next_choice_func(partial):
             head = partial + [guess]
-            assert isinstance(head,list)
+            assert isinstance(head, list)
             if candidate_matcher(head):
                 # print(head)
                 solutions.put(head)
             elif partial_checker(head):
-                assert isinstance(head,list)
+                assert isinstance(head, list)
                 q.put(head)
 
             else:
