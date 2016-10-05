@@ -220,7 +220,7 @@ def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     if num_solutions > 0:
         return SudokuBoard(br.solutions_queue.get(), size)
     else:
-        return None
+        raise RuntimeError("Solving job timed out!")
 
 
 def main():

@@ -77,7 +77,7 @@ class Backtracker():
             t.start()
             time.sleep(0.1)
 
-    def quit(self):
+    def terminate(self):
         """Terminate all child processes."""
         self.msg_all(1)
         for t in self.mythreads:
