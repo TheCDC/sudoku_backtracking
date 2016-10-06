@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import queue
 import sys
-if sys.platform == "win32":
+if sys.platform in ["win32","darwin"]:
     import multiprocess as multiprocessing
     from multiprocess.managers import BaseManager
 else:
