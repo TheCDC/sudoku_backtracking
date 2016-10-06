@@ -51,6 +51,7 @@ class Backtracker():
         self.manager = LifoManager()
         self.manager.start()
         self.intermediate_queue = self.manager.LifoQueue()
+        self.solutions_queue = self.manager.LifoQueue()
         # self.intermediate_queue = multiprocessing.Queue()
 
         # feed in the starting guesses
@@ -58,7 +59,6 @@ class Backtracker():
             for g in next_choice_func(s):
                 self.intermediate_queue.put([g])
 
-        self.solutions_queue = self.manager.LifoQueue()
         self.outboxes = []
         self.mythreads = []
 
@@ -120,6 +120,7 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
     After that, the results queue is fed out.
     """
     # signal.signal(signal.SIGINT, signal.SIG_IGN)
+    paused = False
     if intermediate_queue is None:
         q = multiprocessing.Queue()
     else:
@@ -138,23 +139,28 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
             print("Received in inbox:", v)
             if v == 1:
                 quit()
-        partial = q.get()
-        # print("partial",partial)
-        try:
-            assert isinstance(partial, list)
-        except AssertionError as e:
-            print("PARTIAL:", partial)
-            raise e
-        for guess in next_choice_func(partial):
-            head = partial + [guess]
-            assert isinstance(head, list)
-            if candidate_matcher(head):
-                # print(head)
-                solutions.put(head)
-            elif partial_checker(head):
+            elif v == 2:
+                paused = True
+            elif v == 3:
+                paused = False
+        if not paused:
+            partial = q.get()
+            # print("partial",partial)
+            try:
+                assert isinstance(partial, list)
+            except AssertionError as e:
+                print("PARTIAL:", partial)
+                raise e
+            for guess in next_choice_func(partial):
+                head = partial + [guess]
                 assert isinstance(head, list)
-                q.put(head)
+                if candidate_matcher(head):
+                    # print(head)
+                    solutions.put(head)
+                elif partial_checker(head):
+                    assert isinstance(head, list)
+                    q.put(head)
 
-            else:
-                pass
-            # print(head)
+                else:
+                    pass
+                # print(head)

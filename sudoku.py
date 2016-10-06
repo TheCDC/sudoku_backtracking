@@ -291,19 +291,37 @@ def main():
             c = (c + 1) % 10
             time.sleep(1)
         except UserRequestedQuit:
-            print("Quitting...")
-            # for t in br.mythreads:
-            #     t.terminate()
-            br.terminate()
-            br.join()
-            # time.sleep(3)
+            # save partials
+            br.msg_all(2)
+            time.sleep(0.2)
             l = []
+            old = []
             while not br.intermediate_queue.empty():
-                l.append(''.join([str(i) for i in br.intermediate_queue.get()]))
+                item = br.intermediate_queue.get()
+                old.append(item)
+                s = ''.join([str(i) for i in item])
+                # print(s)
+                l.append(s)
+                if len(l) % 10000 == 0:
+                    print(len(l))
+            for item in old:
+                br.intermediate_queue.put(item)
+
             with open("partials.txt",'w') as f:
                 f.write('\n'.join(l))
-            print("Exited safely.")
-            sys.exit()
+            br.msg_all(3)
+            response = input("q to quit or enter to continue\n>>>").strip()
+            if response == "q":
+                print("Quitting...")
+                # for t in br.mythreads:
+                #     t.terminate()
+                br.terminate()
+                br.join()
+                # time.sleep(3)
+                print("Exited safely.")
+                sys.exit()
+            else:
+                pass
     br.terminate()
     br.join()
     if not br.solutions_queue.empty():
