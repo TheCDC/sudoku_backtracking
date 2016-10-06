@@ -125,7 +125,8 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
     assert not candidate_matcher is None, "A function to match final solutions must be provided."
     while True:
         # quit()
-        for _ in range(mailbox.qsize()):
+        if not mailbox.empty():
+            while not mailbox.empty():
             v = q.get()
             print("Received:", v)
             if v == 1:

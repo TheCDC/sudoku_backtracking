@@ -214,13 +214,12 @@ def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
         starting_guesses=[[]])
     br.go(numthreads=num_processes)
     ti = time.time()
-    while br.solutions_queue.qsize() == 0 and br.intermediate_queue.qsize() > 0:
+    while not br.solutions_queue.empty() and br.intermediate_queue.empty():
         if timeout:
             if time.time() - ti >= timeout:
                 return None
     br.terminate()
-    num_solutions = br.solutions_queue.qsize()
-    if num_solutions > 0:
+    if not br.solutions_queue.empty():
         return SudokuBoard(br.solutions_queue.get(), size)
     else:
         return None
@@ -268,19 +267,20 @@ def main():
     prev = 0
     cur = 0
     c = 0
-    while br.intermediate_queue.qsize() > 0 and br.solutions_queue.qsize() == 0:
+    while not br.intermediate_queue.empty() and br.solutions_queue.empty():
         # print("test")
-        cur = br.intermediate_queue.qsize()
-        delta = cur - prev
-        solsize = br.solutions_queue.qsize()
-        try:
+        if not sys.platform == "darwin":
+            cur = br.intermediate_queue.qsize()
+            delta = cur - prev
+            solsize = br.solutions_queue.qsize()
             print("inter:", cur, "delta", delta,
                   "sols:", solsize)
+            prev = cur
+        try:
             if c == 0:
                 b = br.intermediate_queue.get()
                 print(SudokuBoard(b, bsize))
                 br.intermediate_queue.put(b)
-            prev = cur
             # input("\n>>>")
             c = (c + 1) % 10
             time.sleep(1)
@@ -291,7 +291,7 @@ def main():
             break
     br.terminate()
     br.join()
-    if br.solutions_queue.qsize() > 0:
+    if not br.solutions_queue.empty():
         print("Solution found!")
         results = []
         for i in range(br.solutions_queue.qsize()):
