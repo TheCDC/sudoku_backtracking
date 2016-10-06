@@ -155,35 +155,21 @@ def sudoku_next_choices(head, size) -> list:
 def sudoku_next_choice_wrapper(serialized_board, size):
     """Return a list of possible next choices given a serialized board."""
     extended = pad_serialized_board(serialized_board, size)
-    # print("Info about choosing next move:",
-    #       serialized_board,
-    #       len(serialized_board),
-    #       (size * size) - len(serialized_board))
-
     def wrapped(head) -> list:
-        # print("Choosing next from", head)
         final = []
         try:
             if len(head) >= len(extended):
-                # print("Reached target length. No more guesses.")
                 final = []
             else:
                 selected = extended[len(head)]
                 if selected == 0:
-                    # print("Empty space. Choosing candidates.")
-                    # if len(head) >= 54 == 0:
-                    #     print(b)
                     final = sudoku_next_choices(head, size)
 
                 else:
-                    # print("Occupied space. Choosing its value.")
                     final = [selected]
         except Exception as e:
             print("HEAD:", head)
             raise e
-        # print("selected for next:", final)
-        # random.shuffle(final)
-        # print(final)
         assert isinstance(final, list)
 
         return final
@@ -246,8 +232,6 @@ def main():
     print("Sudoku")
     print("Test case:")
     start = [int(i) for i in list(
-        """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
-    start = [int(i) for i in list(
         """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
     start = [int(i) for i in list(
         """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
@@ -255,6 +239,8 @@ def main():
         """483921657900305001001806400008102900700000008006708200002609500800203009005010300""")]
     start = [int(i) for i in list(
         """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
+    start = [int(i) for i in list(
+        """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
     # start = []
     bsize = 9
     # print(start)
