@@ -46,8 +46,8 @@ class Backtracker():
         self.manager = LifoManager()
         self.manager.start()
         self.intermediate_queue = self.manager.LifoQueue()
-
         # self.intermediate_queue = multiprocessing.Queue()
+
         # feed in the starting guesses
         for s in starting_guesses:
             for g in next_choice_func(s):
@@ -58,7 +58,7 @@ class Backtracker():
         self.mythreads = []
 
     def go(self, numthreads=1):
-        for i in range(numthreads):
+        for _ in range(numthreads):
             newbox = queue.Queue()
             self.outboxes.append(newbox)
             self.mythreads.append(
@@ -125,7 +125,7 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
     assert not candidate_matcher is None, "A function to match final solutions must be provided."
     while True:
         # quit()
-        for i in range(mailbox.qsize()):
+        for _ in range(mailbox.qsize()):
             v = q.get()
             print("Received:", v)
             if v == 1:

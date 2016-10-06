@@ -33,7 +33,7 @@ class SudokuBoard():
 
     def check(self) -> bool:
         """Return whether the board is solved."""
-        return self.check_partial() and len(self.original) == self.square
+        return len(self.original) == self.square and set(self.all_digits) - set(self.original) == set() and self.check_partial()
 
     def quadrant(self, n) -> list:
         """Return a list of all cells in the nth quadrant, start fomr the top left
@@ -204,7 +204,7 @@ def solve_string(s, *args, **kwargs) -> SudokuBoard:
 def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     """Take a list serialized board and return the solved board.
     Results may vary based on threading."""
-    tb = SudokuBoard(l,size)
+    tb = SudokuBoard(l, size)
     if not tb.check_partial():
         raise ValueError("Ilegal starting board.")
     br = backtracking.Backtracker(
