@@ -6,6 +6,7 @@ import backtracking
 import time
 import sys
 
+
 class SudokuBoard():
 
     """Handle a Sudoku board and various bits of information needed to solve it."""
@@ -77,6 +78,9 @@ class SudokuBoard():
 
     def candidates(self, x, y) -> set:
         """Get the set of possible digits that could be filled into cell at x,y"""
+        cur = self.get(x, y)
+        if cur != 0:
+            return set([cur])
         ns = []
         # horizontal line
         ns.extend(self.row(y))
@@ -95,9 +99,21 @@ class SudokuBoard():
         # print("Candidates for",x,y,cans)
         return cans
 
+    def populate(self):
+        for x in range(self.size):
+            for y in range(self.size):
+                cur = self.get(x, y)
+                if cur == 0:
+                    cs = self.candidates(x, y)
+                    if len(cs) == 1:
+                        self.set(cs.pop(), x, y)
+
     def get(self, x, y) -> int:
         """Get value of cell at x,y"""
         return self.rows[y][x]
+
+    def set(self, n, x, y):
+        self.rows[y][x] = n
 
     def __repr__(self) -> str:
         return "SudokuBoard({}, {})".format(self.serialized, self.size)
@@ -117,7 +133,7 @@ def sublists(l, partition_size) -> list:
 
 
 def pad_serialized_board(head, size) -> tuple:
-    return tuple(head) + tuple(0 for i in range((size * size) - len(head)))
+    return head + [0 for i in range((size * size) - len(head))]
 
 
 def invalid_set(x) -> bool:
@@ -132,6 +148,7 @@ def invalid_set(x) -> bool:
 
 def sudoku_next_choices(head, size) -> list:
     b = SudokuBoard(head, size)
+    b.populate()
     return list(b.candidates(*lin_to_xy(len(head), size)))
 
 
@@ -229,9 +246,11 @@ def main():
     print("Sudoku")
     print("Test case:")
     start = [int(i) for i in list(
+        """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
+    start = [int(i) for i in list(
         """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
     start = [int(i) for i in list(
-        """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
+        """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
     start = [int(i) for i in list(
         """483921657900305001001806400008102900700000008006708200002609500800203009005010300""")]
     start = [int(i) for i in list(
@@ -242,15 +261,6 @@ def main():
     tb = SudokuBoard(start, bsize)
     print(tb)
     assert tb.check_partial(), "Test input failure"
-    # print(tb.quadrant(0))
-    # assert tb.quadrant(0) == [int(i) for i in list("003900001")]
-    # assert tb.quadrant(4) == [int(i) for i in list("102000708")]
-    # assert tb.quadrant(5) == [int(i) for i in list("900008200")]
-    # assert tb.row(0) == [int(i) for i in list("003020600")]
-    # assert tb.row(8) == [int(i) for i in "005010300"]
-    # print(tb.candidates(0,0))
-    # input()
-    # print(solve_list(start, 9, 8,timeout=60000))
 
     try:
         numthreads = int(input("How many threads? default=8\n>>>").strip())
