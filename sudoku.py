@@ -5,7 +5,11 @@ Any functions involving a board should be aware of this."""
 import backtracking
 import time
 import sys
+import os
+import signal
 
+class UserRequestedQuit(Exception):
+    pass
 
 class SudokuBoard():
 
@@ -227,20 +231,25 @@ def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     else:
         return None
 
+def quit_handler(a,b):
+    print("Caught Ctrl-C")
+    raise UserRequestedQuit()
+
 
 def main():
+    os.setpgrp()
     print("Sudoku")
     print("Test case:")
     start = [int(i) for i in list(
         """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
     start = [int(i) for i in list(
-        """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
-    start = [int(i) for i in list(
-        """483921657900305001001806400008102900700000008006708200002609500800203009005010300""")]
-    start = [int(i) for i in list(
         """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
     start = [int(i) for i in list(
         """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
+    start = [int(i) for i in list(
+        """483921657900305001001806400008102900700000008006708200002609500800203009005010300""")]
+    start = [int(i) for i in list(
+        """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
     # start = []
     bsize = 9
     # print(start)
@@ -249,9 +258,9 @@ def main():
     assert tb.check_partial(), "Test input failure"
 
     try:
-        numthreads = int(input("How many threads? default=8\n>>>").strip())
+        numthreads = int(input("How many threads? default=4\n>>>").strip())
     except ValueError:
-        numthreads = 8
+        numthreads = 4
     print(numthreads, "threads")
     br = backtracking.Backtracker(
         next_choice_func=sudoku_next_choice_wrapper(start, bsize),
@@ -259,6 +268,7 @@ def main():
         partial_checker=sudoku_partial_wrapper(bsize),
         starting_guesses=[[]])
     br.go(numthreads=numthreads)
+    signal.signal(signal.SIGINT,quit_handler)
 
     prev = 0
     cur = 0
@@ -280,11 +290,20 @@ def main():
             # input("\n>>>")
             c = (c + 1) % 10
             time.sleep(1)
-        except KeyboardInterrupt:
+        except UserRequestedQuit:
+            print("Quitting...")
             # for t in br.mythreads:
             #     t.terminate()
+            br.terminate()
+            br.join()
+            # time.sleep(3)
+            l = []
+            while not br.intermediate_queue.empty():
+                l.append(''.join([str(i) for i in br.intermediate_queue.get()]))
+            with open("partials.txt",'w') as f:
+                f.write('\n'.join(l))
             print("Exited safely.")
-            break
+            sys.exit()
     br.terminate()
     br.join()
     if not br.solutions_queue.empty():
@@ -298,6 +317,7 @@ def main():
         with open("solutions.txt", 'w') as f:
             f.write("{} boards\n".format(len(results)) +
                     '\n'.join(str(i) for i in results))
+
 
 if __name__ == '__main__':
     main()

@@ -9,10 +9,15 @@ else:
     from multiprocessing.managers import BaseManager
 from queue import LifoQueue
 import time
-
-
+import signal
 class LifoManager(BaseManager):
-    pass
+    def __init__(self,*args,**kwargs):
+        signal.signal(signal.SIGINT,signal.SIG_IGN)
+        super(LifoManager,self).__init__(*args,**kwargs)
+    def start(self, *args, **kwargs):
+        super(LifoManager,self).start(*args,**kwargs)
+
+
 LifoManager.register('LifoQueue', LifoQueue)
 
 
@@ -41,7 +46,7 @@ class Backtracker():
         self.next_choice_func = next_choice_func
         self.starting_guesses = starting_guesses
         self.partial_checker = partial_checker
-        self. candidate_matcher = candidate_matcher
+        self.candidate_matcher = candidate_matcher
         # instantiate a manager that knows lifo queues
         self.manager = LifoManager()
         self.manager.start()
@@ -53,7 +58,7 @@ class Backtracker():
             for g in next_choice_func(s):
                 self.intermediate_queue.put([g])
 
-        self.solutions_queue = multiprocessing.Queue()
+        self.solutions_queue = self.manager.LifoQueue()
         self.outboxes = []
         self.mythreads = []
 
@@ -63,7 +68,7 @@ class Backtracker():
             self.outboxes.append(newbox)
             self.mythreads.append(
                 multiprocessing.Process(
-                    target=thread_target_wrapper(
+                    target=worker_wrapper(
                         next_choice_func=self.next_choice_func,
                         partial_checker=self.partial_checker,
                         candidate_matcher=self.candidate_matcher,
@@ -79,9 +84,10 @@ class Backtracker():
 
     def terminate(self):
         """Terminate all child processes."""
-        # self.msg_all(1)
-        for t in self.mythreads:
+        self.msg_all(1)
+        for index,t in enumerate(self.mythreads):
             t.terminate()
+            t.join()
 
     def msg_all(self, m):
         """Put a message in mailbox queues of all children."""
@@ -94,10 +100,10 @@ class Backtracker():
             t.join()
 
 
-def thread_target_wrapper(*args, **kwargs):
-    def wrapped():
+def worker_wrapper(*args, **kwargs):
+    def worker():
         return backtrack(*args, **kwargs)
-    return wrapped
+    return worker
 
 
 def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None):
@@ -113,6 +119,7 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
     The algorithm has finished when the queue is empty.
     After that, the results queue is fed out.
     """
+    # signal.signal(signal.SIGINT, signal.SIG_IGN)
     if intermediate_queue is None:
         q = multiprocessing.Queue()
     else:
@@ -123,14 +130,14 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
     else:
         solutions = solutions_queue
     assert not candidate_matcher is None, "A function to match final solutions must be provided."
+
     while True:
         # quit()
-        if not mailbox.empty():
-            while not mailbox.empty():
-                v = q.get()
-                print("Received:", v)
-                if v == 1:
-                    quit()
+        while not mailbox.empty():
+            v = q.get()
+            print("Received in inbox:", v)
+            if v == 1:
+                quit()
         partial = q.get()
         # print("partial",partial)
         try:
@@ -151,4 +158,3 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
             else:
                 pass
             # print(head)
-    quit()
