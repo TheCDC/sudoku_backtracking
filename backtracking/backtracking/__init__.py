@@ -127,10 +127,10 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
         # quit()
         if not mailbox.empty():
             while not mailbox.empty():
-            v = q.get()
-            print("Received:", v)
-            if v == 1:
-                quit()
+                v = q.get()
+                print("Received:", v)
+                if v == 1:
+                    quit()
         partial = q.get()
         # print("partial",partial)
         try:
