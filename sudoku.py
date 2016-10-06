@@ -4,7 +4,7 @@ The whole board will be a 1-dimensional list of digits.
 Any functions involving a board should be aware of this."""
 import backtracking
 import time
-
+import sys
 
 class SudokuBoard():
 
@@ -294,7 +294,7 @@ def main():
     if not br.solutions_queue.empty():
         print("Solution found!")
         results = []
-        for i in range(br.solutions_queue.qsize()):
+        while not br.solutions_queue.empty():
             r = SudokuBoard(br.solutions_queue.get(), bsize)
             print(r)
             results.append(r)
