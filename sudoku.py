@@ -9,6 +9,7 @@ import os
 import signal
 import copy
 
+
 class UserRequestedQuit(Exception):
     pass
 
@@ -34,7 +35,7 @@ class SudokuBoard():
         self.serialized = pad_serialized_board(serialized, size)
         self.rows = []
         self.rows = sublists(self.serialized, size)
-        self.rownums = []
+        self.rownums = list(range(1, self.size + 1))
         self.colnums = []
 
     def clone(self):
@@ -43,11 +44,11 @@ class SudokuBoard():
         other.size = self.size
         other.root = self.root
         other.square = self.square
-        other.original = self.original[:]
-        other.serialized = self.serialized[:]
-        other.rows = copy.deepcopy(self.rows[:])
-        other.rownums = self.rownums[:]
-        other.colnums = self.colnums[:]
+        other.original = copy.deepcopy(self.original)
+        other.serialized = copy.deepcopy(self.serialized)
+        other.rows = copy.deepcopy(self.rows)
+        other.rownums = copy.deepcopy(self.rownums)
+        other.colnums = copy.deepcopy(self.colnums)
         return other
 
     def check(self) -> bool:
@@ -64,6 +65,13 @@ class SudokuBoard():
             col_offset = self.root * (n % self.root)
             sq.extend(row[col_offset: col_offset + self.root])
         return sq
+
+    def get(self, x, y) -> int:
+        """Get value of cell at x,y"""
+        return self.rows[y][x]
+
+    def set(self, n, x, y):
+        self.rows[y][x] = n
 
     def row(self, y) -> list:
         """Return a list of all cells in the nth row."""
@@ -115,7 +123,7 @@ class SudokuBoard():
         """Return xy coords of next empty cell, None if there are none."""
         for index, r in enumerate(self.rows):
             try:
-                return (r.index(0),index)
+                return (r.index(0), index)
             except ValueError:
                 pass
         else:
@@ -139,24 +147,24 @@ class SudokuBoard():
         Sort the rows of quadrants in descending order weightes by the number of knowns/row.
         Then within each column of quadrants sort the columns to create contiguous knowns."""
         self.populate()
-        out = []
-        self.rownums = []
-        for qrownum, quad_row in enumerate(sublists(self.rows, self.root)):
-            rows_and_weights = [(r, i, weight_row(r))
-                                for i, r in enumerate(quad_row)]
-            rows_and_weights.sort(key=lambda x: x[2], reverse=True)
-            out.extend([i[0] for i in rows_and_weights])
-            self.rownums.extend(
-                [i[1] + qrownum * self.root for i in rows_and_weights])
-        self.rows = out
+        outrows = []
+        outrownums = []
+        for qrownum, quad_rows in enumerate(sublists(self.rows, self.root)):
+            offset = qrownum * self.root
+            zipped = list(zip(quad_rows, self.rownums[
+                          offset:offset + self.root]))
+            zipped.sort(key=lambda x: weight_row(x[0]), reverse=True)
+            outrows.extend(i[0] for i in zipped)
+            outrownums.extend(i[1] for i in zipped)
+        self.rows = outrows
+        self.rownums = outrownums
 
-    def get(self, x, y) -> int:
-        """Get value of cell at x,y"""
-        return self.rows[y][x]
-
-    def set(self, n, x, y):
-        self.rows[y][x] = n
-
+    def untransform(self) -> None:
+        """Sort self.rows by self.rownums."""
+        zipped = list(zip(self.rows, self.rownums))
+        zipped.sort(key = lambda x: x[1])
+        self.rows = [i[0] for i in zipped]
+        self.rownums = [i[1] for i in zipped]
     def __repr__(self) -> str:
         rs = []
         [rs.extend(r) for r in self.rows]
@@ -230,6 +238,8 @@ def sudoku_next_choices(board) -> list:
     return out
 
 # @functools.lru_cache(maxsize=1024)
+
+
 def sudoku_test_func(head, size) -> bool:
     result = SudokuBoard(head, size).check_partial()
     # print("Checking if", head, "is valid,", result)
@@ -259,8 +269,8 @@ def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     br = backtracking.Backtracker(
         next_choice_func=sudoku_next_choices,
         candidate_matcher=sudoku_final_test,
-        partial_checker=sudoku_partial_wrapper(size),
-        starting_guesses=[])
+        partial_checker=sudoku_partial_test,
+        starting_guesses=[tb])
     br.go(numthreads=num_processes)
     ti = time.time()
     while not br.solutions_queue.empty() and br.intermediate_queue.empty():
@@ -280,8 +290,8 @@ def quit_handler(a, b):
 
 
 def main():
-
-    os.setpgrp()
+    if sys.platform == "linux":
+        os.setpgrp()
     print("Sudoku")
     print("Test case:")
     start = [int(i) for i in list(
@@ -291,9 +301,9 @@ def main():
     start = [int(i) for i in list(
         """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
     start = [int(i) for i in list(
-        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
-    start = [int(i) for i in list(
         """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
+    start = [int(i) for i in list(
+        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
     # start = []
     bsize = 9
     # print(start)
@@ -302,7 +312,7 @@ def main():
     assert tb.check_partial(), "Test input failure"
 
     try:
-        numthreads = int(input("How many threads? default=4\n>>>").strip())
+        numthreads = int(input("How many processes? default=4\n>>>").strip())
     except ValueError:
         numthreads = 4
     print(numthreads, "threads")
@@ -371,7 +381,8 @@ def main():
         results = []
         while not br.solutions_queue.empty():
             r = br.solutions_queue.get()
-            print(r)
+            r.untransform()
+            print(r, r.rownums)
             results.append(r)
         results = [i for i in results if i.check()]
         with open("solutions.txt", 'w') as f:
