@@ -57,7 +57,7 @@ class Backtracker():
         # feed in the starting guesses
         for s in starting_guesses:
             for g in next_choice_func(s):
-                self.intermediate_queue.put([g])
+                self.intermediate_queue.put(g)
 
         self.outboxes = []
         self.mythreads = []
@@ -144,23 +144,20 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
             elif v == 3:
                 paused = False
         if not paused:
-            partial = q.get()
-            # print("partial",partial)
             try:
-                assert isinstance(partial, list)
-            except AssertionError as e:
-                print("PARTIAL:", partial)
-                raise e
-            for guess in next_choice_func(partial):
-                head = partial + [guess]
-                assert isinstance(head, list)
-                if candidate_matcher(head):
-                    # print(head)
-                    solutions.put(head)
-                elif partial_checker(head):
-                    assert isinstance(head, list)
-                    q.put(head)
+                partial = q.get()
+                # print(partial)
+                # print("partial",partial)
+                if candidate_matcher(partial):
+                    # print(partial)
+                    solutions.put(partial)
+                for guess in next_choice_func(partial):
+                    if partial_checker(guess):
+                        q.put(guess)
 
-                else:
-                    pass
-                # print(head)
+                    else:
+                        # print("BAD:",partial)
+                        pass
+                    # print(head)
+            except queue.Empty:
+                pass

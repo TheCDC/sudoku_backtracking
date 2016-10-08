@@ -7,9 +7,11 @@ import time
 import sys
 import os
 import signal
+import copy
 
 class UserRequestedQuit(Exception):
     pass
+
 
 class SudokuBoard():
 
@@ -25,20 +27,31 @@ class SudokuBoard():
             raise ValueError("Requested size too small ({})".format(size))
         elif size**(1 / 2) % 1 != 0:
             raise ValueError("Size must be a square number!")
+        elif not isinstance(serialized, list):
+            raise ValueError("input must be list")
         # assert type(serialized[0]) == int, "Must be list of ints."
         self.original = serialized[:]
         self.serialized = pad_serialized_board(serialized, size)
         self.rows = []
         self.rows = sublists(self.serialized, size)
-        # print(self.rows)
-        # print("Constructed this board: ")
-        # pp(self.rows)
-        # print("From this list:", serialized)
-        self.all_digits = set(range(1, size + 1))
+        self.rownums = []
+        self.colnums = []
+
+    def clone(self):
+        other = SudokuBoard(self.serialized[:], self.size)
+        other.size = self.size
+        other.root = self.root
+        other.square = self.square
+        other.original = self.original[:]
+        other.serialized = self.serialized[:]
+        other.rows = copy.deepcopy(self.rows[:])
+        other.rownums = self.rownums[:]
+        other.colnums = self.colnums[:]
+        return other
 
     def check(self) -> bool:
         """Return whether the board is solved."""
-        return len(self.original) == self.square and set(self.all_digits) - set(self.original) == set() and self.check_partial()
+        return (self.next_empty() is None) and self.check_partial()
 
     def quadrant(self, n) -> list:
         """Return a list of all cells in the nth quadrant, start fomr the top left
@@ -64,9 +77,6 @@ class SudokuBoard():
 
     def check_partial(self) -> bool:
         """Return whether the board does not violate any rules."""
-        if len(self.original) > self.square:
-            return False
-
         for i in range(self.size):
             if invalid_set(self.row(i)) or invalid_set(self.col(i)) or invalid_set(self.quadrant(i)):
                 # print("invalid row", row)
@@ -98,12 +108,20 @@ class SudokuBoard():
             for y in range(ymin, ymax):
                 ns.append(self.rows[y][x])
 
-        cans = self.all_digits - set(ns) - set([0])
-        # print(set(ns) - set([0]))
-        # print("Candidates for",x,y,cans)
-        return cans
+        return all_digits(self.size) - set(ns) - set([0])
 
-    def populate(self):
+    def next_empty(self) -> tuple:
+        """Return xy coords of next empty cell, None if there are none."""
+        for index, r in enumerate(self.rows):
+            try:
+                return (r.index(0),index)
+            except ValueError:
+                pass
+        else:
+            return None
+            # raise ValueError("No empty spaces on board.")
+
+    def populate(self) -> None:
         for x in range(self.size):
             for y in range(self.size):
                 cur = self.get(x, y)
@@ -111,6 +129,24 @@ class SudokuBoard():
                     cs = self.candidates(x, y)
                     if len(cs) == 1:
                         self.set(cs.pop(), x, y)
+
+    def optimize(self) -> None:
+        """Transform the board such that knowns are concentrated in the top left.
+        Keep track of transformations in self.transform_hist.
+
+        Sort the rows of quadrants in descending order weightes by the number of knowns/row.
+        Then within each column of quadrants sort the columns to create contiguous knowns."""
+        self.populate()
+        out = []
+        self.rownums = []
+        for qrownum, quad_row in enumerate(sublists(self.rows, self.root)):
+            rows_and_weights = [(r, i, weight_row(r))
+                                for i, r in enumerate(quad_row)]
+            rows_and_weights.sort(key=lambda x: x[2], reverse=True)
+            out.extend([i[0] for i in rows_and_weights])
+            self.rownums.extend(
+                [i[1] + qrownum * self.root for i in rows_and_weights])
+        self.rows = out
 
     def get(self, x, y) -> int:
         """Get value of cell at x,y"""
@@ -120,12 +156,30 @@ class SudokuBoard():
         self.rows[y][x] = n
 
     def __repr__(self) -> str:
-        return "SudokuBoard({}, {})".format(self.serialized, self.size)
+        rs = []
+        [rs.extend(r) for r in self.rows]
+        return "SudokuBoard({}, {})".format(rs, self.size)
 
     def __str__(self) -> str:
         sroot = int(self.size**(1 / 2))
         rowsep = "\n" + "-" * (self.size + self.size // self.root + 1)
         return rowsep + "\n" + '\n'.join("|" + ''.join(str(i) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + (rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
+
+
+def weight_row(r):
+    """Higher rating is better.
+    Measure how closely information is """
+    continuous = 0
+    for i in r:
+        if r != 0:
+            continuous += 1
+        else:
+            break
+    return sum((i != 0) / (index + 1) for index, i in enumerate(r)) / len(r)
+
+
+def all_digits(size):
+    return set(range(1, size + 1))
 
 
 def lin_to_xy(n, size) -> tuple:
@@ -150,36 +204,22 @@ def invalid_set(x) -> bool:
     return uniques < nozeroes
 
 
-def sudoku_next_choices(head, size) -> list:
-    b = SudokuBoard(head, size)
-    b.populate()
-    return list(b.candidates(*lin_to_xy(len(head), size)))
-
-
-def sudoku_next_choice_wrapper(serialized_board, size):
-    """Return a list of possible next choices given a serialized board."""
-    extended = pad_serialized_board(serialized_board, size)
-    def wrapped(head) -> list:
-        final = []
-        try:
-            if len(head) >= len(extended):
-                final = []
-            else:
-                selected = extended[len(head)]
-                if selected == 0:
-                    final = sudoku_next_choices(head, size)
-
-                else:
-                    final = [selected]
-        except Exception as e:
-            print("HEAD:", head)
-            raise e
-        assert isinstance(final, list)
-
-        return final
-
-    return wrapped
-
+def sudoku_next_choices(board) -> list:
+    out = []
+    try:
+        x, y = board.next_empty()
+    except TypeError:
+        # no spaces found
+        return []
+    # print(x,y)
+    for c in board.candidates(x, y):
+        # print(c,x,y)
+        b = board.clone()
+        b.set(c, x, y)
+        # print(b)
+        out.append(b)
+        # print("Set",x,y,"to",c)
+    return out
 
 # @functools.lru_cache(maxsize=1024)
 def sudoku_test_func(head, size) -> bool:
@@ -188,18 +228,12 @@ def sudoku_test_func(head, size) -> bool:
     return result
 
 
-def sudoku_partial_wrapper(size):
-    def wrapped(head) -> bool:
-        return sudoku_test_func(head, size)
-    return wrapped
+def sudoku_final_test(board):
+    return board.check()
 
 
-def sudoku_final_wrapper(size):
-    def wrapped(head) -> bool:
-        # print(head)
-        # return len(head) == size * size
-        return SudokuBoard(head, size).check()
-    return wrapped
+def sudoku_partial_test(board):
+    return board.check_partial()
 
 
 def solve_string(s, *args, **kwargs) -> SudokuBoard:
@@ -215,10 +249,10 @@ def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     if not tb.check_partial():
         raise ValueError("Ilegal starting board.")
     br = backtracking.Backtracker(
-        next_choice_func=sudoku_next_choice_wrapper(l, size),
-        candidate_matcher=sudoku_final_wrapper(size),
+        next_choice_func=sudoku_next_choices,
+        candidate_matcher=sudoku_final_test,
         partial_checker=sudoku_partial_wrapper(size),
-        starting_guesses=[[]])
+        starting_guesses=[])
     br.go(numthreads=num_processes)
     ti = time.time()
     while not br.solutions_queue.empty() and br.intermediate_queue.empty():
@@ -231,7 +265,8 @@ def solve_list(l, size, num_processes, timeout=None) -> SudokuBoard:
     else:
         return None
 
-def quit_handler(a,b):
+
+def quit_handler(a, b):
     print("Caught Ctrl-C")
     raise UserRequestedQuit()
 
@@ -241,13 +276,13 @@ def main():
     print("Sudoku")
     print("Test case:")
     start = [int(i) for i in list(
-        """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
-    start = [int(i) for i in list(
-        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
-    start = [int(i) for i in list(
         """000050040200800530510029678000004003072030950600200000125940087098003002060080000""")]
     start = [int(i) for i in list(
         """483921657900305001001806400008102900700000008006708200002609500800203009005010300""")]
+    start = [int(i) for i in list(
+        """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
+    start = [int(i) for i in list(
+        """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
     start = [int(i) for i in list(
         """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
     # start = []
@@ -263,17 +298,17 @@ def main():
         numthreads = 4
     print(numthreads, "threads")
     br = backtracking.Backtracker(
-        next_choice_func=sudoku_next_choice_wrapper(start, bsize),
-        candidate_matcher=sudoku_final_wrapper(bsize),
-        partial_checker=sudoku_partial_wrapper(bsize),
-        starting_guesses=[[]])
+        next_choice_func=sudoku_next_choices,
+        candidate_matcher=sudoku_final_test,
+        partial_checker=sudoku_partial_test,
+        starting_guesses=[tb])
     br.go(numthreads=numthreads)
-    signal.signal(signal.SIGINT,quit_handler)
+    signal.signal(signal.SIGINT, quit_handler)
 
     prev = 0
     cur = 0
     c = 0
-    while not br.intermediate_queue.empty() and br.solutions_queue.empty():
+    while br.solutions_queue.empty():
         # print("test")
         if not sys.platform == "darwin":
             cur = br.intermediate_queue.qsize()
@@ -285,7 +320,7 @@ def main():
         try:
             if c == 0:
                 b = br.intermediate_queue.get()
-                print(SudokuBoard(b, bsize))
+                print(b)
                 br.intermediate_queue.put(b)
             # input("\n>>>")
             c = (c + 1) % 10
@@ -299,15 +334,13 @@ def main():
             while not br.intermediate_queue.empty():
                 item = br.intermediate_queue.get()
                 old.append(item)
-                s = ''.join([str(i) for i in item])
-                # print(s)
-                l.append(s)
+                l.append(str(item))
                 if len(l) % 10000 == 0:
                     print(len(l))
-            for item in old:
+            for item in old[::-1]:
                 br.intermediate_queue.put(item)
 
-            with open("partials.txt",'w') as f:
+            with open("partials.txt", 'w') as f:
                 f.write('\n'.join(l))
             br.msg_all(3)
             response = input("q to quit or enter to continue\n>>>").strip()
@@ -328,7 +361,7 @@ def main():
         print("Solution found!")
         results = []
         while not br.solutions_queue.empty():
-            r = SudokuBoard(br.solutions_queue.get(), bsize)
+            r = br.solutions_queue.get()
             print(r)
             results.append(r)
         results = [i for i in results if i.check()]
