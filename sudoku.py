@@ -301,9 +301,9 @@ def main():
     start = [int(i) for i in list(
         """000000000000000000000000000000000000000000000000000000000000000000000000000000000""")]
     start = [int(i) for i in list(
-        """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
-    start = [int(i) for i in list(
         """003020600900305001001806400008102900700000008006708200002609500800203009005010300""")]
+    start = [int(i) for i in list(
+        """800000000003600000070090200050007000000045700000100030001000068008500010090000400""")]
     # start = []
     bsize = 9
     # print(start)
@@ -327,6 +327,7 @@ def main():
     prev = 0
     cur = 0
     c = 0
+    ti_solve = time.time()
     while br.solutions_queue.empty():
         # print("test")
         if not sys.platform == "darwin":
@@ -378,11 +379,12 @@ def main():
     br.join()
     if not br.solutions_queue.empty():
         print("Solution found!")
+        print("DeltaT = ",time.time() -  ti_solve,"seconds")
         results = []
         while not br.solutions_queue.empty():
             r = br.solutions_queue.get()
             r.untransform()
-            print(r, r.rownums)
+            print(r)
             results.append(r)
         results = [i for i in results if i.check()]
         with open("solutions.txt", 'w') as f:
