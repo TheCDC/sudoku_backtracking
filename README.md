@@ -13,3 +13,6 @@ I learned that you have to manipulate your data so that information is concentra
 I did this by "optimizing" the Sudoku boards by weighting each row in a row of quadrants by the measure of how well filled in cells were concentrated towards the beginning of that row. The measure is a formula is a came up with where a bigger number is better. The rows are then sorted in descending order. The original order the rows is also tracked.
 
 Sorting the rows like this increases the allows more possibilities to be eliminated faster.
+
+# Acknowledgements #
+A big thank you to Aaron Renfroe for figuring out the information density bit.
