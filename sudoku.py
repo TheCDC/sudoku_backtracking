@@ -38,6 +38,7 @@ class SudokuBoard():
         self.colnums = []
 
     def clone(self):
+        """Clone self, a deep copy."""
         other = SudokuBoard(self.serialized[:], self.size)
         other.size = self.size
         other.root = self.root
@@ -122,6 +123,7 @@ class SudokuBoard():
             # raise ValueError("No empty spaces on board.")
 
     def populate(self) -> None:
+        """Fill in all the freebies."""
         for x in range(self.size):
             for y in range(self.size):
                 cur = self.get(x, y)
@@ -179,14 +181,19 @@ def weight_row(r):
 
 
 def all_digits(size):
+    """Return all possible digits of a board of a given size."""
     return set(range(1, size + 1))
 
 
 def lin_to_xy(n, size) -> tuple:
+    """Get xy coords of linear position starting at top left
+    and going right and down."""
     return (n % size, n // size)
 
 
 def sublists(l, partition_size) -> list:
+    """Return list of lists.
+    l partitioned lists of length equal to partition_size."""
     return [l[i:i + partition_size] for i in range(0, len(l), partition_size)]
 
 
@@ -217,6 +224,7 @@ def sudoku_next_choices(board) -> list:
         b = board.clone()
         b.set(c, x, y)
         # print(b)
+        b.optimize()
         out.append(b)
         # print("Set",x,y,"to",c)
     return out
@@ -272,6 +280,7 @@ def quit_handler(a, b):
 
 
 def main():
+
     os.setpgrp()
     print("Sudoku")
     print("Test case:")
