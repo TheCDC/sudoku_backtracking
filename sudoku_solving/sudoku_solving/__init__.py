@@ -148,7 +148,8 @@ class SudokuBoard():
 
         Sort the rows of quadrants in descending order weighted by the number of knowns/row.
         """
-        self.populate()
+        while self.populate() != 0:
+            pass
         outrows = []
         outrownums = []
         sorted_quad_rows = []
@@ -317,10 +318,10 @@ def solve_string(s, *args, size=9, **kwargs) -> SudokuBoard:
                           )
 
 
-def solve_list(l, size=9,*args, **kwargs) -> SudokuBoard:
+def solve_list(l, size=9, *args, **kwargs) -> SudokuBoard:
     """Take a list serialized board and return the solved board.
     Results may vary based on threading."""
-    return solve_sudoku(SudokuBoard(l, size),*args, **kwargs)
+    return solve_sudoku(SudokuBoard(l, size), *args, **kwargs)
 
 
 def quit_handler(a, b):
@@ -352,11 +353,17 @@ def main():
     tb = SudokuBoard(start, bsize)
     print(tb)
     assert tb.check_partial(), "Test input failure"
-
+    numthreads = 4
     try:
-        numthreads = int(input("How many processes? default=4\n>>>").strip())
+        while True:
+            numthreads = int(
+                input("How many processes? default=4\n>>>").strip())
+            if numthreads > 32:
+                input("Are you sure you want {} processes?".format(numthreads))
+            else:
+                break
     except ValueError:
-        numthreads = 4
+        pass
     print(numthreads, "process(es)")
     ti_solve = time.time()
     br = backtracking.Backtracker(

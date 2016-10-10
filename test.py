@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    # print(sudoku_solving.locals)
     test_results = {}
     # for num_procs in [4,8,12,16,20,24,32]:
     for num_procs in range(4, 32 + 1, 2):
@@ -24,7 +23,8 @@ def main():
             test_results[num_procs].append(tf - ti)
     for k, i in sorted(test_results.items(), key=lambda x: x[0]):
         print(k, sum(i) / len(i))
-
+    with open("benchmarks.txt",'w') as f:
+        f.write(str(test_results))
     plt.figure()
     xs, ys = list(zip(*sorted(test_results.items(), key=lambda x: x[0])))
     ys = [sum(i)/len(i) for i in ys]
