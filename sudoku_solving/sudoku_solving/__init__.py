@@ -128,8 +128,10 @@ class SudokuBoard():
         return None
         # raise ValueError("No empty spaces on board.")
 
-    def populate(self) -> None:
-        """Fill in all the freebies."""
+    def populate(self) -> int:
+        """Fill in all the freebies.
+        Returns the number of freebies filled in."""
+        count = 0
         for x in range(self.size):
             for y in range(self.size):
                 cur = self.get(x, y)
@@ -137,6 +139,8 @@ class SudokuBoard():
                     cs = self.candidates(x, y)
                     if len(cs) == 1:
                         self.set(cs.pop(), x, y)
+                        count += 1
+        return count
 
     def optimize(self) -> None:
         """Transform the board such that knowns are concentrated in the top left.
@@ -191,7 +195,7 @@ class SudokuBoard():
     def __str__(self) -> str:
         sroot = int(self.size**(1 / 2))
         rowsep = "\n" + "-" * (self.size + self.size // self.root + 1)
-        return rowsep + "\n" + '\n'.join("|" + ''.join(str(i) + " " * (len(str(self.size)) - len(str(i))) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + (rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
+        return rowsep + "\n" + '\n'.join("|" + ''.join((str(i) if i != 0 else "-") + " " * (len(str(self.size)) - len(str(i))) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + (rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
 
 
 def weight_row(r):
