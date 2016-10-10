@@ -1,0 +1,3 @@
+#!/usr/bin/env pyton3
+from sudoku_solving import *
+main()

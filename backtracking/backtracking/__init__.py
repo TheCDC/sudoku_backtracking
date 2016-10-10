@@ -52,6 +52,7 @@ class Backtracker():
         self.manager.start()
         self.intermediate_queue = self.manager.LifoQueue()
         self.solutions_queue = self.manager.LifoQueue()
+        self.discard_queue = self.manager.LifoQueue()
         # self.intermediate_queue = multiprocessing.Queue()
 
         # feed in the starting guesses
@@ -74,7 +75,8 @@ class Backtracker():
                         candidate_matcher=self.candidate_matcher,
                         intermediate_queue=self.intermediate_queue,
                         solutions_queue=self.solutions_queue,
-                        mailbox=newbox
+                        mailbox=newbox,
+                        discard=self.discard_queue
                     )
                 )
             )
@@ -85,7 +87,7 @@ class Backtracker():
     def terminate(self):
         """Terminate all child processes."""
         self.msg_all(1)
-        for index,t in enumerate(self.mythreads):
+        for t in self.mythreads:
             t.terminate()
             t.join()
 
@@ -106,7 +108,7 @@ def worker_wrapper(*args, **kwargs):
     return worker
 
 
-def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None):
+def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None, discard=None):
     """next_choice_func should be a function that take a sequences and 
     returns any a list of all possible next items in that sequence.
     candidate_matcher should be a function that returns whether 
@@ -138,6 +140,7 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
             v = q.get()
             print("Received in inbox:", v)
             if v == 1:
+                # return
                 quit()
             elif v == 2:
                 paused = True
@@ -157,6 +160,8 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
 
                     else:
                         # print("BAD:",partial)
+                        if discard:
+                            discard.put(guess)
                         pass
                     # print(head)
             except queue.Empty:
