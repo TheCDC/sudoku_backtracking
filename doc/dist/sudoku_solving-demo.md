@@ -27,7 +27,7 @@ Begin by importing the library. As always, never use wildcard imports in product
 from sudoku_solving import *
 ```
 
-Boards can be created form strings or lists. The size of the board is assumed to be 9x9, unless specified otherwise.
+Boards can be created from strings or lists. The size of the board is assumed to be 9x9, unless specified otherwise.
 
 
 ```python
@@ -253,7 +253,7 @@ print("Old",board,"New",board.optimized().unoptimized(),sep='\n')
 
 
 ## Iterative Solving ##
-The `populate` method of the SudokuBoard object fill in all the freebies. It is called automatically by optimize. It is often useful to call it by itself as it returns the number of freebies filled in.
+The `populate` method of the SudokuBoard object fills in all the freebies. It is called automatically by the `optimize` method. It is often useful to call it by itself as it returns the number of freebies it filled in.
 
 
 ```python

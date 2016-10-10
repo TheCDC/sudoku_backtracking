@@ -1,12 +1,12 @@
 Solving sudoku puzzles with backtracking.
 
 # Setup #
-This project now no longer requires the end user to install my backtracking library. It now loads the module directly from the project directory.
+This project requires installation of the included `backtracking` and `sudoku_solving` modules.
 
-
+To do so, simply run `./install.sh`. I have only tested this on Ubuntu Linux. It may work on OSX.
 
 # Run it #
-`./sudoku.py` on *nix or `python sudoku.py` on Windows. Doing this will have it run whatever test board I currently have it set to solve. Eventually there will be a proper interface/API.
+`python3 -m sudoku_solving` `python -m  sudoku_solving` depending on your OS and python command name. Doing this will have it run whatever test board I currently have it set to solve. Eventually there will be a proper interface/API.
 
 # Solving Strategy #
 My solving strategy is normal backtracking but with a twist. The solving starts from the top left of the board. Now of course backtracking is faster the more partial solutions you can discard earlier on so I wrote a short routine that weights a given row on the board. The weighting is based on how many freebies are on the row and how closely concentrated to the left they are. For this weight a larger number is better. Each row in each row of quadrants is then sorted in descending order by their weights. Finally, the rows of quadrants are sorted by the weights of their highest scoring rows. The original order is remembered and boards can be "de-optimized" for output purposes.
@@ -50,7 +50,7 @@ Begin by importing the library. As always, never use wildcard imports in product
 from sudoku_solving import *
 ```
 
-Boards can be created form strings or lists. The size of the board is assumed to be 9x9, unless specified otherwise.
+Boards can be created from strings or lists. The size of the board is assumed to be 9x9, unless specified otherwise.
 
 
 ```python
@@ -276,7 +276,7 @@ print("Old",board,"New",board.optimized().unoptimized(),sep='\n')
 
 
 ## Iterative Solving ##
-The `populate` method of the SudokuBoard object fill in all the freebies. It is called automatically by optimize. It is often useful to call it by itself as it returns the number of freebies filled in.
+The `populate` method of the SudokuBoard object fills in all the freebies. It is called automatically by the `optimize` method. It is often useful to call it by itself as it returns the number of freebies it filled in.
 
 
 ```python
