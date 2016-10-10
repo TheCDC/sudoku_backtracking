@@ -1,14 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html><head><title>Python: module sudoku</title>
+<html><head><title>Python: package sudoku_solving</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>sudoku</strong></big></big></font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>sudoku_solving</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/mnt/EE20B84020B81197/Dropbox/Projects/Computer%20Science/Backtracking/sudoku.py">/mnt/EE20B84020B81197/Dropbox/Projects/Computer Science/Backtracking/sudoku.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/mnt/EE20B84020B81197/Dropbox/Projects/Computer%20Science/Backtracking/sudoku_solving/sudoku_solving/__init__.py">/mnt/EE20B84020B81197/Dropbox/Projects/Computer Science/Backtracking/sudoku_solving/sudoku_solving/__init__.py</a></font></td></tr></table>
     <p><tt>Sudoku&nbsp;stuff&nbsp;will&nbsp;be&nbsp;working&nbsp;with&nbsp;a&nbsp;serialized&nbsp;version&nbsp;of&nbsp;a&nbsp;board.<br>
 The&nbsp;whole&nbsp;board&nbsp;will&nbsp;be&nbsp;a&nbsp;1-dimensional&nbsp;list&nbsp;of&nbsp;digits.<br>
 Any&nbsp;functions&nbsp;involving&nbsp;a&nbsp;board&nbsp;should&nbsp;be&nbsp;aware&nbsp;of&nbsp;this.</tt></p>
@@ -16,16 +16,12 @@ Any&nbsp;functions&nbsp;involving&nbsp;a&nbsp;board&nbsp;should&nbsp;be&nbsp;awa
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Package Contents</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="backtracking.html">backtracking</a><br>
-<a href="copy.html">copy</a><br>
-</td><td width="25%" valign=top><a href="os.html">os</a><br>
-<a href="signal.html">signal</a><br>
-</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
-<a href="time.html">time</a><br>
-</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="sudoku_solving.__main__.html">__main__</a><br>
+</td><td width="25%" valign=top><a href="sudoku_solving.~__init__.html">~__init__</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -36,13 +32,13 @@ Any&nbsp;functions&nbsp;involving&nbsp;a&nbsp;board&nbsp;should&nbsp;be&nbsp;awa
 <dt><font face="helvetica, arial"><a href="builtins.html#Exception">builtins.Exception</a>(<a href="builtins.html#BaseException">builtins.BaseException</a>)
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="sudoku.html#UserRequestedQuit">UserRequestedQuit</a>
+<dt><font face="helvetica, arial"><a href="sudoku_solving.html#UserRequestedQuit">UserRequestedQuit</a>
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="sudoku.html#SudokuBoard">SudokuBoard</a>
+<dt><font face="helvetica, arial"><a href="sudoku_solving.html#SudokuBoard">SudokuBoard</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -56,13 +52,13 @@ Any&nbsp;functions&nbsp;involving&nbsp;a&nbsp;board&nbsp;should&nbsp;be&nbsp;awa
 <td colspan=2><tt>Handle&nbsp;a&nbsp;Sudoku&nbsp;board&nbsp;and&nbsp;various&nbsp;bits&nbsp;of&nbsp;information&nbsp;needed&nbsp;to&nbsp;solve&nbsp;it.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="SudokuBoard-__init__"><strong>__init__</strong></a>(self, serialized, size)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+<dl><dt><a name="SudokuBoard-__init__"><strong>__init__</strong></a>(self, serialized, size=9)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
 
 <dl><dt><a name="SudokuBoard-__repr__"><strong>__repr__</strong></a>(self) -&gt; str</dt><dd><tt>Return&nbsp;repr(self).</tt></dd></dl>
 
 <dl><dt><a name="SudokuBoard-__str__"><strong>__str__</strong></a>(self) -&gt; str</dt><dd><tt>Return&nbsp;str(self).</tt></dd></dl>
 
-<dl><dt><a name="SudokuBoard-candidates"><strong>candidates</strong></a>(self, x, y) -&gt; &lt;function SudokuBoard.set at 0x7f1d90563e18&gt;</dt><dd><tt>Get&nbsp;the&nbsp;set&nbsp;of&nbsp;possible&nbsp;digits&nbsp;that&nbsp;could&nbsp;be&nbsp;filled&nbsp;into&nbsp;cell&nbsp;at&nbsp;x,y</tt></dd></dl>
+<dl><dt><a name="SudokuBoard-candidates"><strong>candidates</strong></a>(self, x, y) -&gt; &lt;function SudokuBoard.set at 0x7f79ae9710d0&gt;</dt><dd><tt>Get&nbsp;the&nbsp;set&nbsp;of&nbsp;possible&nbsp;digits&nbsp;that&nbsp;could&nbsp;be&nbsp;filled&nbsp;into&nbsp;cell&nbsp;at&nbsp;x,y</tt></dd></dl>
 
 <dl><dt><a name="SudokuBoard-check"><strong>check</strong></a>(self) -&gt; bool</dt><dd><tt>Return&nbsp;whether&nbsp;the&nbsp;board&nbsp;is&nbsp;solved.</tt></dd></dl>
 
@@ -81,6 +77,8 @@ Keep&nbsp;track&nbsp;of&nbsp;original&nbsp;shape&nbsp;of&nbsp;the&nbsp;board&nbs
 &nbsp;<br>
 Sort&nbsp;the&nbsp;rows&nbsp;of&nbsp;quadrants&nbsp;in&nbsp;descending&nbsp;order&nbsp;weighted&nbsp;by&nbsp;the&nbsp;number&nbsp;of&nbsp;knowns/row.</tt></dd></dl>
 
+<dl><dt><a name="SudokuBoard-optimized"><strong>optimized</strong></a>(self)</dt><dd><tt>Return&nbsp;optimized&nbsp;copy&nbsp;of&nbsp;self.</tt></dd></dl>
+
 <dl><dt><a name="SudokuBoard-populate"><strong>populate</strong></a>(self) -&gt; None</dt><dd><tt>Fill&nbsp;in&nbsp;all&nbsp;the&nbsp;freebies.</tt></dd></dl>
 
 <dl><dt><a name="SudokuBoard-quadrant"><strong>quadrant</strong></a>(self, n) -&gt; list</dt><dd><tt>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;cells&nbsp;in&nbsp;the&nbsp;nth&nbsp;quadrant,&nbsp;start&nbsp;fomr&nbsp;the&nbsp;top&nbsp;left<br>
@@ -90,7 +88,9 @@ and&nbsp;going&nbsp;first&nbsp;to&nbsp;the&nbsp;right&nbsp;then&nbsp;down.</tt><
 
 <dl><dt><a name="SudokuBoard-set"><strong>set</strong></a>(self, n, x, y)</dt></dl>
 
-<dl><dt><a name="SudokuBoard-untransform"><strong>untransform</strong></a>(self) -&gt; None</dt><dd><tt>Sort&nbsp;self.<strong>rows</strong>&nbsp;by&nbsp;self.<strong>rownums</strong>.</tt></dd></dl>
+<dl><dt><a name="SudokuBoard-unoptimize"><strong>unoptimize</strong></a>(self) -&gt; None</dt><dd><tt>Sort&nbsp;self.<strong>rows</strong>&nbsp;by&nbsp;self.<strong>rownums</strong>.</tt></dd></dl>
+
+<dl><dt><a name="SudokuBoard-unoptimized"><strong>unoptimized</strong></a>(self)</dt><dd><tt>Return&nbsp;untransformed&nbsp;copy&nbsp;of&nbsp;self.</tt></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -110,7 +110,7 @@ Data descriptors defined here:<br>
 <td colspan=2><tt><a href="builtins.html#Exception">Exception</a>&nbsp;to&nbsp;replace&nbsp;KeyboardInterrupt&nbsp;events.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="sudoku.html#UserRequestedQuit">UserRequestedQuit</a></dd>
+<dd><a href="sudoku_solving.html#UserRequestedQuit">UserRequestedQuit</a></dd>
 <dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
 <dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
 <dd><a href="builtins.html#object">builtins.object</a></dd>
@@ -169,23 +169,26 @@ Data descriptors inherited from <a href="builtins.html#BaseException">builtins.B
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl><dt><a name="-all_digits"><strong>all_digits</strong></a>(size)</dt><dd><tt>Return&nbsp;all&nbsp;possible&nbsp;digits&nbsp;of&nbsp;a&nbsp;board&nbsp;of&nbsp;a&nbsp;given&nbsp;size.</tt></dd></dl>
+ <dl><dt><a name="-board_from_string"><strong>board_from_string</strong></a>(s, size=9)</dt></dl>
  <dl><dt><a name="-invalid_set"><strong>invalid_set</strong></a>(x) -&gt; bool</dt></dl>
  <dl><dt><a name="-lin_to_xy"><strong>lin_to_xy</strong></a>(n, size) -&gt; tuple</dt><dd><tt>Get&nbsp;xy&nbsp;coords&nbsp;of&nbsp;linear&nbsp;position&nbsp;starting&nbsp;at&nbsp;top&nbsp;left<br>
 and&nbsp;going&nbsp;right&nbsp;and&nbsp;down.</tt></dd></dl>
  <dl><dt><a name="-main"><strong>main</strong></a>()</dt></dl>
  <dl><dt><a name="-pad_serialized_board"><strong>pad_serialized_board</strong></a>(head, size) -&gt; tuple</dt></dl>
  <dl><dt><a name="-quit_handler"><strong>quit_handler</strong></a>(a, b)</dt></dl>
- <dl><dt><a name="-solve_list"><strong>solve_list</strong></a>(l, size, num_processes, timeout=None) -&gt; sudoku.SudokuBoard</dt><dd><tt>Take&nbsp;a&nbsp;list&nbsp;serialized&nbsp;board&nbsp;and&nbsp;return&nbsp;the&nbsp;solved&nbsp;board.<br>
+ <dl><dt><a name="-solve_list"><strong>solve_list</strong></a>(l, *args, size=9, **kwargs) -&gt; sudoku_solving.SudokuBoard</dt><dd><tt>Take&nbsp;a&nbsp;list&nbsp;serialized&nbsp;board&nbsp;and&nbsp;return&nbsp;the&nbsp;solved&nbsp;board.<br>
 Results&nbsp;may&nbsp;vary&nbsp;based&nbsp;on&nbsp;threading.</tt></dd></dl>
- <dl><dt><a name="-solve_string"><strong>solve_string</strong></a>(s, *args, **kwargs) -&gt; sudoku.SudokuBoard</dt><dd><tt>Take&nbsp;a&nbsp;string&nbsp;serialized&nbsp;board&nbsp;return&nbsp;the&nbsp;solved&nbsp;board.<br>
-Results&nbsp;may&nbsp;vary&nbsp;based&nbsp;on&nbsp;threading.</tt></dd></dl>
+ <dl><dt><a name="-solve_string"><strong>solve_string</strong></a>(s, *args, size=9, **kwargs) -&gt; sudoku_solving.SudokuBoard</dt><dd><tt>Take&nbsp;a&nbsp;string&nbsp;serialized&nbsp;board&nbsp;return&nbsp;the&nbsp;solved&nbsp;board.<br>
+Results&nbsp;may&nbsp;vary&nbsp;based&nbsp;on&nbsp;threading&nbsp;and&nbsp;race&nbsp;conditions.</tt></dd></dl>
+ <dl><dt><a name="-solve_sudoku"><strong>solve_sudoku</strong></a>(board, *, num_processes=4, timeout=10)</dt></dl>
  <dl><dt><a name="-sublists"><strong>sublists</strong></a>(l, partition_size) -&gt; list</dt><dd><tt>Return&nbsp;list&nbsp;of&nbsp;lists.<br>
 l&nbsp;partitioned&nbsp;lists&nbsp;of&nbsp;length&nbsp;equal&nbsp;to&nbsp;partition_size.</tt></dd></dl>
- <dl><dt><a name="-sudoku_final_test"><strong>sudoku_final_test</strong></a>(board)</dt></dl>
- <dl><dt><a name="-sudoku_next_choices"><strong>sudoku_next_choices</strong></a>(board) -&gt; list</dt></dl>
- <dl><dt><a name="-sudoku_partial_test"><strong>sudoku_partial_test</strong></a>(board)</dt></dl>
- <dl><dt><a name="-sudoku_test_func"><strong>sudoku_test_func</strong></a>(head, size) -&gt; bool</dt></dl>
+ <dl><dt><a name="-sudoku_final_test"><strong>sudoku_final_test</strong></a>(board)</dt><dd><tt>Return&nbsp;whether&nbsp;a&nbsp;board&nbsp;is&nbsp;completed.</tt></dd></dl>
+ <dl><dt><a name="-sudoku_next_choices"><strong>sudoku_next_choices</strong></a>(board) -&gt; list</dt><dd><tt>Return&nbsp;next&nbsp;legal&nbsp;permutaions&nbsp;of&nbsp;a&nbsp;board.<br>
+Used&nbsp;for&nbsp;backtracking.</tt></dd></dl>
+ <dl><dt><a name="-sudoku_partial_test"><strong>sudoku_partial_test</strong></a>(board)</dt><dd><tt>Return&nbsp;whether&nbsp;a&nbsp;board&nbsp;is&nbsp;still&nbsp;legal.</tt></dd></dl>
  <dl><dt><a name="-weight_row"><strong>weight_row</strong></a>(r)</dt><dd><tt>Higher&nbsp;rating&nbsp;is&nbsp;better.<br>
-Measure&nbsp;how&nbsp;closely&nbsp;information&nbsp;is</tt></dd></dl>
+Measure&nbsp;how&nbsp;closely&nbsp;information&nbsp;is&nbsp;packed&nbsp;towards&nbsp;the&nbsp;beginning&nbsp;of&nbsp;a&nbsp;row.<br>
+Used&nbsp;when&nbsp;transforming&nbsp;a&nbsp;board&nbsp;to&nbsp;optimize&nbsp;backtracking.</tt></dd></dl>
 </td></tr></table>
 </body></html>
