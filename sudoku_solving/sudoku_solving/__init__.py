@@ -9,6 +9,7 @@ import time
 import os
 import signal
 import copy
+import argparse
 
 
 class UserRequestedQuit(Exception):
@@ -195,8 +196,11 @@ class SudokuBoard():
 
     def __str__(self) -> str:
         sroot = int(self.size**(1 / 2))
-        rowsep = "\n" + "-" * (self.size + self.size // self.root + 1)
-        return rowsep + "\n" + '\n'.join("|" + ''.join((str(i) if i != 0 else "-") + " " * (len(str(self.size)) - len(str(i))) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + (rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
+        rowsep = "-" * (self.size + self.size // self.root + 1)
+        return rowsep + "\n" + ('\n').join("|" + ''.join((str(i) if i != 0 else "-") + " " * (len(str(self.size)) - len(str(i))) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + ("\n" + rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
+
+    def serialize(self):
+        return ''.join(''.join([str(col) for col in row]) for row in self.rows)
 
 
 def weight_row(r):
@@ -329,28 +333,56 @@ def quit_handler(a, b):
     raise UserRequestedQuit()
 
 
+parser = argparse.ArgumentParser(
+    description="Solve Sudoku puzzles with logic and multiprocessed backtracking.")
+parser.add_argument("board",nargs="?", metavar="BOARD",
+                    help="Serialized board, read from top left to right. Use '.' for empty cell.", type=str)
+parser.add_argument(
+    "-s", metavar="Board size. Must be a square number.", type=int, default=9)
+parser.add_argument("-p", metavar="Number of processes.", type=int, default=4)
+parser.add_argument("--flat", action='store_const', const=True)
+parser.add_argument("--debug", action='store_const', const=True)
+parser.add_argument("--show", help="Pretty print the board before solving.",
+                    action='store_const', const=True)
+cmdargs = parser.parse_args()
+if cmdargs.debug:
+    print("ARGS:", cmdargs)
+
+
 def main():
+    if cmdargs.board:
+        try:
+            b = board_from_string(cmdargs.board, cmdargs.s)
+            if cmdargs.show:
+                print(b)
+            solution = solve_sudoku(b, num_processes=cmdargs.p)
+            if cmdargs.flat:
+                print(solution.serialize())
+            else:
+                print(solution)
+
+            quit()
+        except Exception as e:
+            raise e
     if sys.platform == "linux":
         os.setpgrp()
     print("Sudoku")
     print("Test case:")
-    start = list(map(
-        int, "000050040200800530510029678000004003072030950600200000125940087098003002060080000"))
-    start = list(map(
-        int, "483921657900305001001806400008102900700000008006708200002609500800203009005010300"))
-    start = list(map(
-        int, "000000000000000000000000000000000000000000000000000000000000000000000000000000000"))
-    start = list(map(
-        int, "900100400007020080060000000400500200080090010003006000100700030005008900020000006"))
-    start = list(map(
-        int, "003020600900305001001806400008102900700000008006708200002609500800203009005010300"))
-    start = list(map(
-        int, "800000000003600000070090200050007000000045700000100030001000068008500010090000400"))
+    some_boards = [
+        "000050040200800530510029678000004003072030950600200000125940087098003002060080000",
+        "483921657900305001001806400008102900700000008006708200002609500800203009005010300",
+        "000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "900100400007020080060000000400500200080090010003006000100700030005008900020000006",
+        "003020600900305001001806400008102900700000008006708200002609500800203009005010300",
+        "800000000003600000070090200050007000000045700000100030001000068008500010090000400",
+    ]
+    cases = [list(map(
+        int, i)) for i in some_boards]
 
     # start = []
     bsize = 9
     # print(start)
-    tb = SudokuBoard(start, bsize)
+    tb = SudokuBoard(cases[-1], bsize)
     print(tb)
     assert tb.check_partial(), "Test input failure"
     numthreads = 4
@@ -364,6 +396,8 @@ def main():
                 break
     except ValueError:
         pass
+    except EOFError:
+        quit()
     print(numthreads, "process(es)")
     ti_solve = time.time()
     br = backtracking.Backtracker(
