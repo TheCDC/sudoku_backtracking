@@ -333,23 +333,23 @@ def quit_handler(a, b):
     raise UserRequestedQuit()
 
 
-parser = argparse.ArgumentParser(
-    description="Solve Sudoku puzzles with logic and multiprocessed backtracking.")
-parser.add_argument("board",nargs="?", metavar="BOARD",
-                    help="Serialized board, read from top left to right. Use '.' for empty cell.", type=str)
-parser.add_argument(
-    "-s", metavar="Board size. Must be a square number.", type=int, default=9)
-parser.add_argument("-p", metavar="Number of processes.", type=int, default=4)
-parser.add_argument("--flat", action='store_const', const=True)
-parser.add_argument("--debug", action='store_const', const=True)
-parser.add_argument("--show", help="Pretty print the board before solving.",
-                    action='store_const', const=True)
-cmdargs = parser.parse_args()
-if cmdargs.debug:
-    print("ARGS:", cmdargs)
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Solve Sudoku puzzles with logic and multiprocessed backtracking.")
+    parser.add_argument("board",nargs="?", metavar="BOARD",
+                        help="Serialized board, read from top left to right. Use '.' for empty cell.", type=str)
+    parser.add_argument(
+        "-s", metavar="Board size. Must be a square number.", type=int, default=9)
+    parser.add_argument("-p", metavar="Number of processes.", type=int, default=4)
+    parser.add_argument("--flat", action='store_const', const=True)
+    parser.add_argument("--debug", action='store_const', const=True)
+    parser.add_argument("--show", help="Pretty print the board before solving.",
+                        action='store_const', const=True)
+    cmdargs = parser.parse_args()
+    if cmdargs.debug:
+        print("ARGS:", cmdargs)
     if cmdargs.board:
         try:
             b = board_from_string(cmdargs.board, cmdargs.s)
