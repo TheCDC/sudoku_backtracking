@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 
 def main():
+    # print(sudoku_solving.locals)
     test_results = {}
     # for num_procs in [4,8,12,16,20,24,32]:
     for num_procs in range(4, 32 + 1, 2):

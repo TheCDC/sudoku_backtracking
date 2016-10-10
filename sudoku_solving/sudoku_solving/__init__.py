@@ -274,28 +274,16 @@ def sudoku_partial_test(board):
     return board.check_partial()
 
 
-def solve_string(s, *args, size=9, **kwargs) -> SudokuBoard:
-    """Take a string serialized board return the solved board.
-    Results may vary based on threading and race conditions."""
-    if size <= 9:
-        return solve_list([int(i) for i in s], *args, size, **kwargs)
-    else:
-        return solve_list([int(i) if len(i) > 0 else 0 for i in s.split('.')]
-                          * args,
-                          size,
-                          **kwargs
-                          )
-
-
 def board_from_string(s, size=9):
     l = []
     if size <= 9:
         l = list(map(int, s))
     else:
         l = [int(i) if len(i) > 0 else 0 for i in s.split('.')]
-    return SudokuBoard(l,size)
+    return SudokuBoard(l, size)
 
-def solve_sudoku(board,*,num_processes=4,timeout=10):
+
+def solve_sudoku(board, *, num_processes=4, timeout=10):
     if not board.check_partial():
         raise ValueError("Ilegal starting board.")
     br = backtracking.Backtracker(
@@ -315,17 +303,30 @@ def solve_sudoku(board,*,num_processes=4,timeout=10):
         return br.solutions_queue.get().unoptimized()
     else:
         return None
-    
 
-def solve_list(l, *args,size=9,**kwargs) -> SudokuBoard:
+
+def solve_string(s, *args, size=9, **kwargs) -> SudokuBoard:
+    """Take a string serialized board return the solved board.
+    Results may vary based on threading and race conditions."""
+    if size <= 9:
+        return solve_list([int(i) for i in s], *args, size, **kwargs)
+    else:
+        return solve_list([int(i) if len(i) > 0 else 0 for i in s.split('.')],
+                          size,
+                          **kwargs
+                          )
+
+
+def solve_list(l, size=9,*args, **kwargs) -> SudokuBoard:
     """Take a list serialized board and return the solved board.
     Results may vary based on threading."""
-    return solve_sudoku(SudokuBoard(l, size),*args,**kwargs)
+    return solve_sudoku(SudokuBoard(l, size),*args, **kwargs)
 
 
 def quit_handler(a, b):
     print("Caught Ctrl-C")
     raise UserRequestedQuit()
+
 
 def main():
     if sys.platform == "linux":
