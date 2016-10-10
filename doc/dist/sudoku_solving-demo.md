@@ -44,7 +44,6 @@ board = board_from_string(board_str)
 print(board)
 ```
 
-    
     -------------
     |--3|-2-|6--|
     |9--|3-5|--1|
@@ -75,7 +74,6 @@ board = SudokuBoard(board_list)
 print(board)
 ```
 
-    
     -------------
     |--3|-2-|6--|
     |9--|3-5|--1|
@@ -104,7 +102,6 @@ b = SudokuBoard(l,size=4)
 print(b)
 ```
 
-    
     -------
     |1-|3-|
     |-4|-2|
@@ -156,7 +153,6 @@ print("Old",b,"New",b.optimized(),sep='\n')
 ```
 
     Old
-    
     -------
     |1-|3-|
     |-4|-2|
@@ -165,23 +161,21 @@ print("Old",b,"New",b.optimized(),sep='\n')
     |-3|-1|
     -------
     New
-    
     -------
-    |12|34|
-    |34|12|
+    |1-|3-|
+    |-4|-2|
     -------
-    |21|43|
-    |43|21|
+    |2-|4-|
+    |-3|-1|
     -------
 
 
 
 ```python
-print("Old",board,"New",board.optimized(),sep='\n')
+print("Not optimized",board,"Optimized",board.optimized(),sep='\n')
 ```
 
-    Old
-    
+    Not optimized
     -------------
     |--3|-2-|6--|
     |9--|3-5|--1|
@@ -195,18 +189,17 @@ print("Old",board,"New",board.optimized(),sep='\n')
     |8--|2-3|--9|
     |--5|-1-|3--|
     -------------
-    New
-    
+    Optimized
     -------------
-    |8-4|253|7-9|
-    |695|417|3-2|
-    |--2|689|514|
+    |9--|3-5|--1|
+    |--1|8-6|4--|
+    |--3|-2-|6--|
     -------------
-    |9-7|345|821|
-    |--1|876|4--|
-    |--3|921|6--|
+    |8--|2-3|--9|
+    |--2|6-9|5--|
+    |--5|-1-|3--|
     -------------
-    |7-9|5-4|1-8|
+    |7--|---|--8|
     |--8|1-2|9--|
     |--6|7-8|2--|
     -------------
@@ -217,11 +210,10 @@ The user may want to see the untransformed (or de-optimized) version of a board 
 
 
 ```python
-print("Old",board,"New",board.optimized().unoptimized(),sep='\n')
+print("Not Transformed",board,"Un un transformed",board.optimized().unoptimized(),sep='\n')
 ```
 
-    Old
-    
+    Not Transformed
     -------------
     |--3|-2-|6--|
     |9--|3-5|--1|
@@ -235,20 +227,19 @@ print("Old",board,"New",board.optimized().unoptimized(),sep='\n')
     |8--|2-3|--9|
     |--5|-1-|3--|
     -------------
-    New
-    
+    Un un transformed
     -------------
-    |--3|921|6--|
-    |9-7|345|821|
-    |--1|876|4--|
+    |--3|-2-|6--|
+    |9--|3-5|--1|
+    |--1|8-6|4--|
     -------------
     |--8|1-2|9--|
-    |7-9|5-4|1-8|
+    |7--|---|--8|
     |--6|7-8|2--|
     -------------
-    |--2|689|514|
-    |8-4|253|7-9|
-    |695|417|3-2|
+    |--2|6-9|5--|
+    |8--|2-3|--9|
+    |--5|-1-|3--|
     -------------
 
 
@@ -263,7 +254,30 @@ while new_board.populate() != 0:
 print(new_board)
 ```
 
-    
+    -------------
+    |483|921|657|
+    |967|345|821|
+    |251|876|493|
+    -------------
+    |548|132|976|
+    |729|564|138|
+    |136|798|245|
+    -------------
+    |372|689|514|
+    |814|253|769|
+    |695|417|382|
+    -------------
+
+
+The `populate()` method also has an optional `max_depth` argument which specifies the maximum  number of times it the board will try to populate itself. A value of 0 means it will try until it reaches a step in which 0 freebies are filled.
+
+
+```python
+new_board = board.clone()
+new_board.populate(max_depth=0)
+print(new_board)
+```
+
     -------------
     |483|921|657|
     |967|345|821|
@@ -293,7 +307,6 @@ print("Unsolved",board,"Solved", out,sep='\n')
 ```
 
     Unsolved
-    
     -------------
     |--3|-2-|6--|
     |9--|3-5|--1|
@@ -308,7 +321,6 @@ print("Unsolved",board,"Solved", out,sep='\n')
     |--5|-1-|3--|
     -------------
     Solved
-    
     -------------
     |483|921|657|
     |967|345|821|
@@ -337,15 +349,15 @@ for i in range(4,12+1):
     print(i,"processes:","{:.4f} seconds".format(time.time() - ti))
 ```
 
-    4 processes: 0.4269 seconds
-    5 processes: 0.5328 seconds
-    6 processes: 0.6352 seconds
-    7 processes: 0.7354 seconds
-    8 processes: 0.8559 seconds
-    9 processes: 0.9647 seconds
-    10 processes: 1.0713 seconds
-    11 processes: 1.1510 seconds
-    12 processes: 1.2484 seconds
+    4 processes: 0.4314 seconds
+    5 processes: 0.5338 seconds
+    6 processes: 0.6382 seconds
+    7 processes: 0.7372 seconds
+    8 processes: 0.8607 seconds
+    9 processes: 0.9642 seconds
+    10 processes: 1.0696 seconds
+    11 processes: 1.1491 seconds
+    12 processes: 1.2524 seconds
 
 
 ## Performance Analysis ## 
@@ -367,7 +379,6 @@ print(bb)
 print("Num. filled in:",len([i for i in hardest if i != '0']))
 ```
 
-    
     -------------
     |8--|---|---|
     |--3|6--|---|
@@ -405,15 +416,15 @@ for i in range(4,12+1):
     print(i,"processes:","{:.4f} seconds".format(tf - ti))
 ```
 
-    4 processes: 3.1697 seconds
-    5 processes: 4.2305 seconds
-    6 processes: 2.0368 seconds
-    7 processes: 3.7969 seconds
-    8 processes: 3.0657 seconds
-    9 processes: 4.3023 seconds
-    10 processes: 1.8081 seconds
-    11 processes: 3.4827 seconds
-    12 processes: 3.7424 seconds
+    4 processes: 4.1397 seconds
+    5 processes: 3.0847 seconds
+    6 processes: 4.2868 seconds
+    7 processes: 3.3663 seconds
+    8 processes: 2.3661 seconds
+    9 processes: 1.2458 seconds
+    10 processes: 2.3329 seconds
+    11 processes: 3.7856 seconds
+    12 processes: 2.3914 seconds
 
 
 On average I get the best performance with 10 child processes.

@@ -129,19 +129,27 @@ class SudokuBoard():
         return None
         # raise ValueError("No empty spaces on board.")
 
-    def populate(self) -> int:
+    def populate(self,max_depth=1) -> int:
         """Fill in all the freebies.
         Returns the number of freebies filled in."""
-        count = 0
-        for x in range(self.size):
-            for y in range(self.size):
-                cur = self.get(x, y)
-                if cur == 0:
-                    cs = self.candidates(x, y)
-                    if len(cs) == 1:
-                        self.set(cs.pop(), x, y)
-                        count += 1
-        return count
+        if max_depth == 0:
+            max_depth = -1
+        outsum = 0
+        while max_depth != 0:
+            count = 0
+            for x in range(self.size):
+                for y in range(self.size):
+                    cur = self.get(x, y)
+                    if cur == 0:
+                        cs = self.candidates(x, y)
+                        if len(cs) == 1:
+                            self.set(cs.pop(), x, y)
+                            count += 1
+            outsum += count
+            if count == 0:
+                break
+
+        return outsum
 
     def optimize(self) -> None:
         """Transform the board such that knowns are concentrated in the top left.
@@ -149,8 +157,6 @@ class SudokuBoard():
 
         Sort the rows of quadrants in descending order weighted by the number of knowns/row.
         """
-        while self.populate() != 0:
-            pass
         outrows = []
         outrownums = []
         sorted_quad_rows = []
@@ -168,7 +174,6 @@ class SudokuBoard():
                 outrownums.append(row[1])
         self.rows = outrows
         self.rownums = outrownums
-        self.populate()
 
     def optimized(self):
         """Return optimized copy of self."""
@@ -264,6 +269,7 @@ def sudoku_next_choices(board) -> list:
         b.set(c, x, y)
         # print(b)
         b.optimize()
+        b.populate(max_depth=0)
         out.append(b)
         # print("Set",x,y,"to",c)
     return out

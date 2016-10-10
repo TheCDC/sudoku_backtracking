@@ -11831,8 +11831,7 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
--------------
+<pre>-------------
 |--3|-2-|6--|
 |9--|3-5|--1|
 |--1|8-6|4--|
@@ -11881,8 +11880,7 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
--------------
+<pre>-------------
 |--3|-2-|6--|
 |9--|3-5|--1|
 |--1|8-6|4--|
@@ -11936,8 +11934,7 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
--------
+<pre>-------
 |1-|3-|
 |-4|-2|
 -------
@@ -12058,7 +12055,6 @@ False
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Old
-
 -------
 |1-|3-|
 |-4|-2|
@@ -12067,13 +12063,12 @@ False
 |-3|-1|
 -------
 New
-
 -------
-|12|34|
-|34|12|
+|1-|3-|
+|-4|-2|
 -------
-|21|43|
-|43|21|
+|2-|4-|
+|-3|-1|
 -------
 </pre>
 </div>
@@ -12085,10 +12080,10 @@ New
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Old&quot;</span><span class="p">,</span><span class="n">board</span><span class="p">,</span><span class="s2">&quot;New&quot;</span><span class="p">,</span><span class="n">board</span><span class="o">.</span><span class="n">optimized</span><span class="p">(),</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not optimized&quot;</span><span class="p">,</span><span class="n">board</span><span class="p">,</span><span class="s2">&quot;Optimized&quot;</span><span class="p">,</span><span class="n">board</span><span class="o">.</span><span class="n">optimized</span><span class="p">(),</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12101,8 +12096,7 @@ New
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Old
-
+<pre>Not optimized
 -------------
 |--3|-2-|6--|
 |9--|3-5|--1|
@@ -12116,18 +12110,17 @@ New
 |8--|2-3|--9|
 |--5|-1-|3--|
 -------------
-New
-
+Optimized
 -------------
-|8-4|253|7-9|
-|695|417|3-2|
-|--2|689|514|
+|9--|3-5|--1|
+|--1|8-6|4--|
+|--3|-2-|6--|
 -------------
-|9-7|345|821|
-|--1|876|4--|
-|--3|921|6--|
+|8--|2-3|--9|
+|--2|6-9|5--|
+|--5|-1-|3--|
 -------------
-|7-9|5-4|1-8|
+|7--|---|--8|
 |--8|1-2|9--|
 |--6|7-8|2--|
 -------------
@@ -12151,10 +12144,10 @@ New
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Old&quot;</span><span class="p">,</span><span class="n">board</span><span class="p">,</span><span class="s2">&quot;New&quot;</span><span class="p">,</span><span class="n">board</span><span class="o">.</span><span class="n">optimized</span><span class="p">()</span><span class="o">.</span><span class="n">unoptimized</span><span class="p">(),</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not Transformed&quot;</span><span class="p">,</span><span class="n">board</span><span class="p">,</span><span class="s2">&quot;Un un transformed&quot;</span><span class="p">,</span><span class="n">board</span><span class="o">.</span><span class="n">optimized</span><span class="p">()</span><span class="o">.</span><span class="n">unoptimized</span><span class="p">(),</span><span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12167,8 +12160,7 @@ New
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Old
-
+<pre>Not Transformed
 -------------
 |--3|-2-|6--|
 |9--|3-5|--1|
@@ -12182,20 +12174,19 @@ New
 |8--|2-3|--9|
 |--5|-1-|3--|
 -------------
-New
-
+Un un transformed
 -------------
-|--3|921|6--|
-|9-7|345|821|
-|--1|876|4--|
+|--3|-2-|6--|
+|9--|3-5|--1|
+|--1|8-6|4--|
 -------------
 |--8|1-2|9--|
-|7-9|5-4|1-8|
+|7--|---|--8|
 |--6|7-8|2--|
 -------------
-|--2|689|514|
-|8-4|253|7-9|
-|695|417|3-2|
+|--2|6-9|5--|
+|8--|2-3|--9|
+|--5|-1-|3--|
 -------------
 </pre>
 </div>
@@ -12217,7 +12208,7 @@ New
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">new_board</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span> <span class="c1">#the clone method returns a deep copy of a board</span>
@@ -12236,8 +12227,58 @@ New
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
+<pre>-------------
+|483|921|657|
+|967|345|821|
+|251|876|493|
 -------------
+|548|132|976|
+|729|564|138|
+|136|798|245|
+-------------
+|372|689|514|
+|814|253|769|
+|695|417|382|
+-------------
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <code>populate()</code> method also has an optional <code>max_depth</code> argument which specifies the maximum  number of times it the board will try to populate itself. A value of 0 means it will try until it reaches a step in which 0 freebies are filled.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">new_board</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="n">new_board</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_board</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>-------------
 |483|921|657|
 |967|345|821|
 |251|876|493|
@@ -12299,7 +12340,6 @@ New
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Unsolved
-
 -------------
 |--3|-2-|6--|
 |9--|3-5|--1|
@@ -12314,7 +12354,6 @@ New
 |--5|-1-|3--|
 -------------
 Solved
-
 -------------
 |483|921|657|
 |967|345|821|
@@ -12369,15 +12408,15 @@ The number of process is actually the number of child processes that are perform
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>4 processes: 0.4269 seconds
-5 processes: 0.5328 seconds
-6 processes: 0.6352 seconds
-7 processes: 0.7354 seconds
-8 processes: 0.8559 seconds
-9 processes: 0.9647 seconds
-10 processes: 1.0713 seconds
-11 processes: 1.1510 seconds
-12 processes: 1.2484 seconds
+<pre>4 processes: 0.4314 seconds
+5 processes: 0.5338 seconds
+6 processes: 0.6382 seconds
+7 processes: 0.7372 seconds
+8 processes: 0.8607 seconds
+9 processes: 0.9642 seconds
+10 processes: 1.0696 seconds
+11 processes: 1.1491 seconds
+12 processes: 1.2524 seconds
 </pre>
 </div>
 </div>
@@ -12425,8 +12464,7 @@ The number of process is actually the number of child processes that are perform
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
--------------
+<pre>-------------
 |8--|---|---|
 |--3|6--|---|
 |-7-|-9-|2--|
@@ -12517,15 +12555,15 @@ Num. filled in: 21
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>4 processes: 3.1697 seconds
-5 processes: 4.2305 seconds
-6 processes: 2.0368 seconds
-7 processes: 3.7969 seconds
-8 processes: 3.0657 seconds
-9 processes: 4.3023 seconds
-10 processes: 1.8081 seconds
-11 processes: 3.4827 seconds
-12 processes: 3.7424 seconds
+<pre>4 processes: 4.1397 seconds
+5 processes: 3.0847 seconds
+6 processes: 4.2868 seconds
+7 processes: 3.3663 seconds
+8 processes: 2.3661 seconds
+9 processes: 1.2458 seconds
+10 processes: 2.3329 seconds
+11 processes: 3.7856 seconds
+12 processes: 2.3914 seconds
 </pre>
 </div>
 </div>
