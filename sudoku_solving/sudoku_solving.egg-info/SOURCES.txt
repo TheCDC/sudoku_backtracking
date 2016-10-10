@@ -2,6 +2,7 @@ setup.py
 bin/sudoku_solving
 sudoku_solving/__init__.py
 sudoku_solving/__main__.py
+sudoku_solving/~__init__.py
 sudoku_solving.egg-info/PKG-INFO
 sudoku_solving.egg-info/SOURCES.txt
 sudoku_solving.egg-info/dependency_links.txt
