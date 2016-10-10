@@ -360,19 +360,19 @@ for i in range(4,12+1):
     print(i,"processes:","{:.4f} seconds".format(time.time() - ti))
 ```
 
-    4 processes: 0.4279 seconds
-    5 processes: 0.5339 seconds
-    6 processes: 0.6324 seconds
-    7 processes: 0.7353 seconds
-    8 processes: 0.8566 seconds
-    9 processes: 0.9598 seconds
-    10 processes: 1.0621 seconds
-    11 processes: 1.1476 seconds
-    12 processes: 1.2515 seconds
+    4 processes: 0.4269 seconds
+    5 processes: 0.5328 seconds
+    6 processes: 0.6352 seconds
+    7 processes: 0.7354 seconds
+    8 processes: 0.8559 seconds
+    9 processes: 0.9647 seconds
+    10 processes: 1.0713 seconds
+    11 processes: 1.1510 seconds
+    12 processes: 1.2484 seconds
 
 
 ## Performance Analysis ## 
- The particular board I have been demoing is relatively easy and can be solved using logic only. As such, adding more processes increases overhead for no particular benefit. However, there do exist board that are difficult enough to merit multiprocessing. For example, the "hardest sudoku board ever"
+ The particular board I have been demoing is relatively easy and can be solved using logic only. As such, adding more processes increases overhead for no particular benefit, as you may have noticed by the solve time increasing with the number of processes. However, there do exist boards that are difficult enough to merit multiprocessing. For example, the "hardest sudoku board ever"
 
 
 ```python
@@ -411,23 +411,10 @@ This particular board is extremely difficult and requires several layers of gues
 
 
 ```python
-print(bb.optimized().unoptimized())
+print("Num. freebies:",bb.populate())
 ```
 
-    
-    -------------
-    |8--|---|---|
-    |--3|6--|---|
-    |-7-|-9-|2--|
-    -------------
-    |-5-|--7|---|
-    |---|-45|7--|
-    |---|1--|-3-|
-    -------------
-    |--1|---|-68|
-    |--8|5--|-1-|
-    |-9-|---|4--|
-    -------------
+    Num. freebies: 0
 
 
 Beause we already have a board object we will use the solve_sudoku function instead of solve_list. The same benchmarking process as before is repeated. these numbers are completely system dependent but should demonstrate that there is an optimal number of child processes for a given task on a given system.
@@ -441,15 +428,15 @@ for i in range(4,12+1):
     print(i,"processes:","{:.4f} seconds".format(tf - ti))
 ```
 
-    4 processes: 4.7653 seconds
-    5 processes: 4.9994 seconds
-    6 processes: 4.9234 seconds
-    7 processes: 4.1053 seconds
-    8 processes: 3.0231 seconds
-    9 processes: 2.1188 seconds
-    10 processes: 2.8239 seconds
-    11 processes: 3.6276 seconds
-    12 processes: 5.2644 seconds
+    4 processes: 3.1697 seconds
+    5 processes: 4.2305 seconds
+    6 processes: 2.0368 seconds
+    7 processes: 3.7969 seconds
+    8 processes: 3.0657 seconds
+    9 processes: 4.3023 seconds
+    10 processes: 1.8081 seconds
+    11 processes: 3.4827 seconds
+    12 processes: 3.7424 seconds
 
 
 On average I get the best performance with 10 child processes.
