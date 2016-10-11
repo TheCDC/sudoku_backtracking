@@ -274,22 +274,22 @@ The `populate()` method also has an optional `max_depth` argument which specifie
 
 ```python
 new_board = board.clone()
-new_board.populate(max_depth=0)
+new_board.populate(max_depth=1)
 print(new_board)
 ```
 
     -------------
-    |483|921|657|
-    |967|345|821|
-    |251|876|493|
+    |--3|-2-|6--|
+    |9--|3-5|--1|
+    |--1|8-6|4--|
     -------------
-    |548|132|976|
-    |729|564|138|
-    |136|798|245|
+    |--8|1-2|9--|
+    |7--|--4|1-8|
+    |--6|7-8|2--|
     -------------
-    |372|689|514|
-    |814|253|769|
-    |695|417|382|
+    |--2|6-9|5-4|
+    |8--|2-3|7-9|
+    |--5|417|3--|
     -------------
 
 
@@ -349,15 +349,15 @@ for i in range(4,12+1):
     print(i,"processes:","{:.4f} seconds".format(time.time() - ti))
 ```
 
-    4 processes: 0.4314 seconds
-    5 processes: 0.5338 seconds
-    6 processes: 0.6382 seconds
-    7 processes: 0.7372 seconds
-    8 processes: 0.8607 seconds
-    9 processes: 0.9642 seconds
-    10 processes: 1.0696 seconds
-    11 processes: 1.1491 seconds
-    12 processes: 1.2524 seconds
+    4 processes: 0.4594 seconds
+    5 processes: 0.5675 seconds
+    6 processes: 0.6694 seconds
+    7 processes: 0.7720 seconds
+    8 processes: 0.9000 seconds
+    9 processes: 1.0117 seconds
+    10 processes: 1.1081 seconds
+    11 processes: 1.1992 seconds
+    12 processes: 1.2964 seconds
 
 
 ## Performance Analysis ## 
@@ -416,15 +416,13 @@ for i in range(4,12+1):
     print(i,"processes:","{:.4f} seconds".format(tf - ti))
 ```
 
-    4 processes: 4.1397 seconds
-    5 processes: 3.0847 seconds
-    6 processes: 4.2868 seconds
-    7 processes: 3.3663 seconds
-    8 processes: 2.3661 seconds
-    9 processes: 1.2458 seconds
-    10 processes: 2.3329 seconds
-    11 processes: 3.7856 seconds
-    12 processes: 2.3914 seconds
+    4 processes: 8.4966 seconds
+    5 processes: 5.4864 seconds
+    6 processes: 8.6744 seconds
+    7 processes: 7.3742 seconds
+    8 processes: 6.9449 seconds
+    9 processes: 9.9659 seconds
+    10 processes: 7.8037 seconds
 
 
 On average I get the best performance with 10 child processes.

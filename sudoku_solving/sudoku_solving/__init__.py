@@ -146,6 +146,7 @@ class SudokuBoard():
                             self.set(cs.pop(), x, y)
                             count += 1
             outsum += count
+            max_depth -= 1
             if count == 0:
                 break
 
