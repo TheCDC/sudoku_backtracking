@@ -428,9 +428,9 @@ def main():
             print(r)
             results.append(r)
         results = [i for i in results if i.check()]
-        with open("solutions.txt", 'w') as f:
-            f.write("{} boards\n".format(len(results)) +
-                    '\n'.join(str(i) for i in results))
+        # with open("solutions.txt", 'w') as f:
+        #     f.write("{} boards\n".format(len(results)) +
+        #             '\n'.join(str(i) for i in results))
 
     # discarded = []
     # while not br.discard_queue.empty():
