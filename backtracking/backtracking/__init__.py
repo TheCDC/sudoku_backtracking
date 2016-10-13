@@ -10,6 +10,7 @@ else:
 from queue import LifoQueue
 import time
 import signal
+import copy
 class LifoManager(BaseManager):
     def __init__(self,*args,**kwargs):
         signal.signal(signal.SIGINT,signal.SIG_IGN)
@@ -43,10 +44,10 @@ class Backtracker():
         if None in [next_choice_func, partial_checker]:
             raise ValueError(
                 "Backtracking requires both next_choice_func and partial_checker!")
-        self.next_choice_func = next_choice_func
-        self.starting_guesses = starting_guesses
-        self.partial_checker = partial_checker
-        self.candidate_matcher = candidate_matcher
+        self.next_choice_func = copy.deepcopy(next_choice_func)
+        self.starting_guesses = copy.deepcopy(starting_guesses)
+        self.partial_checker = copy.deepcopy(partial_checker)
+        self.candidate_matcher = copy.deepcopy(candidate_matcher)
         # instantiate a manager that knows lifo queues
         self.manager = LifoManager()
         self.manager.start()
@@ -69,15 +70,15 @@ class Backtracker():
             self.outboxes.append(newbox)
             self.mythreads.append(
                 multiprocessing.Process(
-                    target=worker_wrapper(
-                        next_choice_func=self.next_choice_func,
-                        partial_checker=self.partial_checker,
-                        candidate_matcher=self.candidate_matcher,
-                        intermediate_queue=self.intermediate_queue,
-                        solutions_queue=self.solutions_queue,
-                        mailbox=newbox,
-                        discard=self.discard_queue
-                    )
+                    target=backtrack,kwargs={
+                        "next_choice_func":copy.deepcopy(self.next_choice_func),
+                        "partial_checker":self.partial_checker,
+                        "candidate_matcher":self.candidate_matcher,
+                        "intermediate_queue":self.intermediate_queue,
+                        "solutions_queue":self.solutions_queue,
+                        "mailbox":newbox,
+                        "discard":self.discard_queue
+                        }
                 )
             )
         for t in self.mythreads:
