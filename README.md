@@ -361,7 +361,7 @@ for i in range(4,12+1):
     12 processes: 0.0651 seconds
 
 
-## Performance Analysis ## 
+## Performance Analysis ##
  The particular board I have been demoing is relatively easy and can be solved using logic only. As such, adding more processes increases overhead for no particular benefit, as you may have noticed by the solve time increasing with the number of processes. However, there do exist boards that are difficult enough to merit multiprocessing. For example, the "hardest sudoku board ever"
 
 
@@ -460,7 +460,7 @@ Backtracking is the practice of traversing the entire possibility tree but pruni
 
 Now imagine that that board ended with the row "123456789". What if I told you you could flip this board on its head and that would give you an easier problem for free? Some boards are easy and some of them are hard and some of those are the same. If the board would instead start with the wholly populated row then that would eliminate...a LOT of work!
 
-### Lifting Weights ## #
+### Lifting Weights ###
 
 The row sorting strategy purposes to concentrate the most possible information earlier in the sequence. The row weighting function uses this line: `sum((i != 0) / (index + 1) for index, i in enumerate(r)) / len(r)`. This procedure heavily skews the weight to prefer rows that have a number in ths first column. This is intentional because of the aforementioned tree pruning. The rows are sorted in descending order by weight and their original order is remembered.
 
