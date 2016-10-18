@@ -1,7 +1,7 @@
 Solving sudoku puzzles with backtracking.
 
 # WARNING #
-This project currently has issues with multiprocessing on Windows because it does not support forking.
+This project currently has issues with multiprocessing on Windows because Windows multiprocessing does not support forking.
 
 # Setup #
 This project requires installation of the included `backtracking` and `sudoku_solving` modules.
