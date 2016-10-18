@@ -11,6 +11,7 @@ from queue import LifoQueue
 import time
 import signal
 import copy
+
 class LifoManager(BaseManager):
     def __init__(self,*args,**kwargs):
         signal.signal(signal.SIGINT,signal.SIG_IGN)
@@ -62,13 +63,13 @@ class Backtracker():
                 self.intermediate_queue.put(g)
 
         self.outboxes = []
-        self.mythreads = []
+        self.children = []
 
     def go(self, numthreads=1):
         for _ in range(numthreads):
             newbox = queue.Queue()
             self.outboxes.append(newbox)
-            self.mythreads.append(
+            self.children.append(
                 multiprocessing.Process(
                     target=backtrack,kwargs={
                         "next_choice_func":copy.deepcopy(self.next_choice_func),
@@ -81,14 +82,14 @@ class Backtracker():
                         }
                 )
             )
-        for t in self.mythreads:
+        for t in self.children:
             t.start()
             # time.sleep(0.1)
 
     def terminate(self):
         """Terminate all child processes."""
         self.msg_all(1)
-        for t in self.mythreads:
+        for t in self.children:
             t.terminate()
             t.join()
 
@@ -99,7 +100,7 @@ class Backtracker():
 
     def join(self):
         """Wait for all children to complete."""
-        for t in self.mythreads:
+        for t in self.children:
             t.join()
 
 
