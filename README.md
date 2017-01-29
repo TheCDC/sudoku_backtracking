@@ -1,4 +1,4 @@
-*Solving sudoku with backtracking, a project by Christopher Chen*
+__Solving sudoku with backtracking, a project by Christopher Chen__
 
 This project lives at [https://github.com/TheCDC/sudoku_backtracking](https://github.com/TheCDC/sudoku_backtracking)
 
