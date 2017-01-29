@@ -474,8 +474,3 @@ TL;DR optimized boards are MUCH faster to solve because you get more information
 ## Part 3 ##
 
 Profit.
-
-
-```python
-
-```
