@@ -1,4 +1,4 @@
-Solving sudoku puzzles with backtracking.
+Solving sudoku with backtracking, a project by Christopher Chen
 
 # WARNING #
 This project currently has issues with multiprocessing on Windows because it does not support forking.
