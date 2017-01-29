@@ -27,7 +27,7 @@ class Backtracker():
     Given the functions necessary to perform backtracking this class
         """
 
-    def __init__(self, *, next_choice_func=None,  starting_guesses=None, partial_checker=None, candidate_matcher=None):
+    def __init__(self, *, next_choice_func =None ,  starting_guesses: list = None, partial_checker=None, candidate_matcher=None):
         """next_choice_func: a function which takes a list (a partial solution) and returns a list of possible next choices.
 
         starting_guesses: a list of sequences (partial solutions) from which the algorithm should start building.
