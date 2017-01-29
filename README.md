@@ -3,7 +3,7 @@ Solving sudoku with backtracking, a project by Christopher Chen
 This project lives at [https://github.com/TheCDC/sudoku_backtracking](https://github.com/TheCDC/sudoku_backtracking)
 
 # WARNING #
-This project currently has issues with multiprocessing on Windows because it does not support forking.
+This project currently has issues with multiprocessing on Windows because it does not support forking. The `multiprocess` library must be installed from source and not pip/pypi. The pip version is outdated. Link here: [https://github.com/uqfoundation/multiprocess](https://github.com/uqfoundation/multiprocess)
 
 # Setup #
 This project requires installation of the included `backtracking` and `sudoku_solving` modules.
