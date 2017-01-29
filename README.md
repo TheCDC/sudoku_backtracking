@@ -1,5 +1,7 @@
 Solving sudoku with backtracking, a project by Christopher Chen
 
+This project lives at [https://github.com/TheCDC/sudoku_backtracking](https://github.com/TheCDC/sudoku_backtracking)
+
 # WARNING #
 This project currently has issues with multiprocessing on Windows because it does not support forking.
 
