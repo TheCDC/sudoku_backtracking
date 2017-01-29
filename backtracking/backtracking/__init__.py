@@ -10,6 +10,8 @@ else:
 from queue import LifoQueue
 import time
 import signal
+import copy
+
 class LifoManager(BaseManager):
     def __init__(self,*args,**kwargs):
         signal.signal(signal.SIGINT,signal.SIG_IGN)
@@ -43,15 +45,16 @@ class Backtracker():
         if None in [next_choice_func, partial_checker]:
             raise ValueError(
                 "Backtracking requires both next_choice_func and partial_checker!")
-        self.next_choice_func = next_choice_func
-        self.starting_guesses = starting_guesses
-        self.partial_checker = partial_checker
-        self.candidate_matcher = candidate_matcher
+        self.next_choice_func = copy.deepcopy(next_choice_func)
+        self.starting_guesses = copy.deepcopy(starting_guesses)
+        self.partial_checker = copy.deepcopy(partial_checker)
+        self.candidate_matcher = copy.deepcopy(candidate_matcher)
         # instantiate a manager that knows lifo queues
         self.manager = LifoManager()
         self.manager.start()
         self.intermediate_queue = self.manager.LifoQueue()
         self.solutions_queue = self.manager.LifoQueue()
+        self.discard_queue = self.manager.LifoQueue()
         # self.intermediate_queue = multiprocessing.Queue()
 
         # feed in the starting guesses
@@ -60,32 +63,33 @@ class Backtracker():
                 self.intermediate_queue.put(g)
 
         self.outboxes = []
-        self.mythreads = []
+        self.children = []
 
     def go(self, numthreads=1):
         for _ in range(numthreads):
             newbox = queue.Queue()
             self.outboxes.append(newbox)
-            self.mythreads.append(
+            self.children.append(
                 multiprocessing.Process(
-                    target=worker_wrapper(
-                        next_choice_func=self.next_choice_func,
-                        partial_checker=self.partial_checker,
-                        candidate_matcher=self.candidate_matcher,
-                        intermediate_queue=self.intermediate_queue,
-                        solutions_queue=self.solutions_queue,
-                        mailbox=newbox
-                    )
+                    target=backtrack,kwargs={
+                        "next_choice_func":copy.deepcopy(self.next_choice_func),
+                        "partial_checker":self.partial_checker,
+                        "candidate_matcher":self.candidate_matcher,
+                        "intermediate_queue":self.intermediate_queue,
+                        "solutions_queue":self.solutions_queue,
+                        "mailbox":newbox,
+                        "discard":self.discard_queue
+                        }
                 )
             )
-        for t in self.mythreads:
+        for t in self.children:
             t.start()
-            time.sleep(0.1)
+            # time.sleep(0.1)
 
     def terminate(self):
         """Terminate all child processes."""
         self.msg_all(1)
-        for index,t in enumerate(self.mythreads):
+        for t in self.children:
             t.terminate()
             t.join()
 
@@ -96,7 +100,7 @@ class Backtracker():
 
     def join(self):
         """Wait for all children to complete."""
-        for t in self.mythreads:
+        for t in self.children:
             t.join()
 
 
@@ -106,7 +110,7 @@ def worker_wrapper(*args, **kwargs):
     return worker
 
 
-def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None):
+def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,  intermediate_queue=None, solutions_queue=None, mailbox=None, discard=None):
     """next_choice_func should be a function that take a sequences and 
     returns any a list of all possible next items in that sequence.
     candidate_matcher should be a function that returns whether 
@@ -138,6 +142,7 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
             v = q.get()
             print("Received in inbox:", v)
             if v == 1:
+                # return
                 quit()
             elif v == 2:
                 paused = True
@@ -157,6 +162,8 @@ def backtrack(next_choice_func, *, partial_checker=None, candidate_matcher=None,
 
                     else:
                         # print("BAD:",partial)
+                        if discard:
+                            discard.put(guess)
                         pass
                     # print(head)
             except queue.Empty:
