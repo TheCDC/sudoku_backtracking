@@ -16,7 +16,6 @@ import copy
 class LifoManager(BaseManager):
 
     def __init__(self, *args, **kwargs):
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
         super(LifoManager, self).__init__(*args, **kwargs)
 
     def start(self, *args, **kwargs):

@@ -137,14 +137,14 @@ class SudokuBoard():
         outsum = 0
         while max_depth != 0:
             count = 0
-            for x in range(self.size):
-                for y in range(self.size):
-                    cur = self.get(x, y)
-                    if cur == 0:
-                        cs = self.candidates(x, y)
-                        if len(cs) == 1:
-                            self.set(cs.pop(), x, y)
-                            count += 1
+            for i in range(self.square):
+                x, y = lin_to_xy(i, self.size)
+                cur = self.get(x, y)
+                if cur == 0:
+                    cs = self.candidates(x, y)
+                    if len(cs) == 1:
+                        self.set(cs.pop(), x, y)
+                        count += 1
             outsum += count
             max_depth -= 1
             if count == 0:
@@ -201,9 +201,7 @@ class SudokuBoard():
         return "SudokuBoard({}, {})".format(rs, self.size)
 
     def __str__(self) -> str:
-        sroot = int(self.size**(1 / 2))
-        rowsep = "-" * (self.size + self.size // self.root + 1)
-        return rowsep + "\n" + ('\n').join("|" + ''.join((str(i) if i != 0 else "-") + " " * (len(str(self.size)) - len(str(i))) + "|" * ((index + 1) % sroot == 0) for index, i in enumerate(row)) + ("\n" + rowsep) * ((irow + 1) % sroot == 0) for irow, row in enumerate(self.rows))
+        return '\n'.join(' '.join(map(str, r)) for r in self.rows)
 
     def serialize(self):
         return ''.join(''.join([str(col) for col in row]) for row in self.rows)
