@@ -129,14 +129,14 @@ class SudokuBoard():
         return None
         # raise ValueError("No empty spaces on board.")
 
-    def populate(self, max_depth=1) -> int:
+    def populate(self, max_depth=None) -> int:
         """Fill in all the freebies.
         Returns the number of freebies filled in."""
-        if max_depth == 0:
+        if max_depth is None:
             max_depth = -1
         outsum = 0
         while max_depth != 0:
-            count = 0
+            delta = 0
             for i in range(self.square):
                 x, y = lin_to_xy(i, self.size)
                 cur = self.get(x, y)
@@ -144,10 +144,10 @@ class SudokuBoard():
                     cs = self.candidates(x, y)
                     if len(cs) == 1:
                         self.set(cs.pop(), x, y)
-                        count += 1
-            outsum += count
+                        delta += 1
+            outsum += delta
             max_depth -= 1
-            if count == 0:
+            if delta == 0:
                 break
 
         return outsum
@@ -204,7 +204,7 @@ class SudokuBoard():
         return '\n'.join(' '.join(map(str, r)) for r in self.rows)
 
     def serialize(self):
-        return ''.join(''.join([str(col) for col in row]) for row in self.rows)
+        return '.'.join('.'.join([str(col) for col in row]) for row in self.rows)
 
 
 def weight_row(r):
