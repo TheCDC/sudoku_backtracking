@@ -129,7 +129,7 @@ class SudokuBoard():
         return None
         # raise ValueError("No empty spaces on board.")
 
-    def populate(self,max_depth=1) -> int:
+    def populate(self, max_depth=1) -> int:
         """Fill in all the freebies.
         Returns the number of freebies filled in."""
         if max_depth == 0:
@@ -295,14 +295,14 @@ def board_from_string(s, size=9):
     return SudokuBoard(l, size)
 
 
-def solve_sudoku(board, *, num_processes=4, timeout=10):
+def solve_sudoku(board, *, num_processes=4, timeout=None):
     if not board.check_partial():
         raise ValueError("Ilegal starting board.")
     br = backtracking.Backtracker(
         next_choice_func=sudoku_next_choices,
         candidate_matcher=sudoku_final_test,
         partial_checker=sudoku_partial_test,
-        starting_guesses=[board])
+        starting_guesses=[board],)
     br.go(numthreads=num_processes)
     ti = time.time()
     while br.solutions_queue.empty():
@@ -340,16 +340,15 @@ def quit_handler(a, b):
     raise UserRequestedQuit()
 
 
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="Solve Sudoku puzzles with logic and multiprocessed backtracking.")
-    parser.add_argument("board",nargs="?", metavar="BOARD",
+    parser.add_argument("board", nargs="?", metavar="BOARD",
                         help="Serialized board, read from top left to right. Use '.' for empty cell.", type=str)
     parser.add_argument(
         "-s", metavar="Board size. Must be a square number.", type=int, default=9)
-    parser.add_argument("-p", metavar="Number of processes.", type=int, default=4)
+    parser.add_argument(
+        "-p", metavar="Number of processes.", type=int, default=4)
     parser.add_argument("--flat", action='store_const', const=True)
     parser.add_argument("--debug", action='store_const', const=True)
     parser.add_argument("--show", help="Pretty print the board before solving.",

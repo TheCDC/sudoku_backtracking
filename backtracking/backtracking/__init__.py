@@ -12,12 +12,15 @@ import time
 import signal
 import copy
 
+
 class LifoManager(BaseManager):
-    def __init__(self,*args,**kwargs):
-        signal.signal(signal.SIGINT,signal.SIG_IGN)
-        super(LifoManager,self).__init__(*args,**kwargs)
+
+    def __init__(self, *args, **kwargs):
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        super(LifoManager, self).__init__(*args, **kwargs)
+
     def start(self, *args, **kwargs):
-        super(LifoManager,self).start(*args,**kwargs)
+        super(LifoManager, self).start(*args, **kwargs)
 
 
 LifoManager.register('LifoQueue', LifoQueue)
@@ -29,7 +32,7 @@ class Backtracker():
     Given the functions necessary to perform backtracking this class
         """
 
-    def __init__(self, *, next_choice_func =None ,  starting_guesses: list = None, partial_checker=None, candidate_matcher=None):
+    def __init__(self, *, next_choice_func=None,  starting_guesses: list = None, partial_checker=None, candidate_matcher=None):
         """next_choice_func: a function which takes a list (a partial solution) and returns a list of possible next choices.
 
         starting_guesses: a list of sequences (partial solutions) from which the algorithm should start building.
@@ -71,15 +74,15 @@ class Backtracker():
             self.outboxes.append(newbox)
             self.children.append(
                 multiprocessing.Process(
-                    target=backtrack,kwargs={
-                        "next_choice_func":copy.deepcopy(self.next_choice_func),
-                        "partial_checker":self.partial_checker,
-                        "candidate_matcher":self.candidate_matcher,
-                        "intermediate_queue":self.intermediate_queue,
-                        "solutions_queue":self.solutions_queue,
-                        "mailbox":newbox,
-                        "discard":self.discard_queue
-                        }
+                    target=backtrack, kwargs={
+                        "next_choice_func": copy.deepcopy(self.next_choice_func),
+                        "partial_checker": self.partial_checker,
+                        "candidate_matcher": self.candidate_matcher,
+                        "intermediate_queue": self.intermediate_queue,
+                        "solutions_queue": self.solutions_queue,
+                        "mailbox": newbox,
+                        "discard": None
+                    }
                 )
             )
         for t in self.children:
